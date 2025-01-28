@@ -1,5 +1,9 @@
 # Tileman
 
+## Development
+
+To run the game on MacOS after installing Love: `open -n -a love "../tileman"`
+
 ## Inspiration
 
 - Balatro for language/framework
