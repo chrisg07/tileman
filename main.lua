@@ -1,11 +1,14 @@
 -- Constants
 local TILE_SIZE = 50 -- Size of each tile in pixels
 local MOVE_SPEED = 200 -- Pixels per second
+local BOUNCE_DURATION = 0.2 -- Total duration of the bounce animation in seconds
+local OVERSHOOT = 1.1 -- Factor for how far the triangle overshoots
 
 -- Variables for character position
 local targetX, targetY -- The grid position the character is moving to
-local currentX, currentY -- The character's current pixel position
-local isMoving = false -- Whether the character is currently moving
+local startX, startY -- Starting position of the bounce animation
+local currentX, currentY -- Current pixel position
+local bounceProgress = 1 -- Animation progress (1 means no animation is happening)
 
 -- Input flag to prevent continuous movement
 local canMove = true
@@ -20,9 +23,11 @@ function love.load()
     GRID_WIDTH = math.floor(screenWidth / TILE_SIZE)
     GRID_HEIGHT = math.floor(screenHeight / TILE_SIZE)
 end
+
+
 function love.keypressed(key)
-    if not isMoving then
-        -- Move to the new tile if not already moving
+    if bounceProgress >= 1 then
+        -- Move to the new tile if no animation is currently running
         if key == "w" then
             targetY = targetY - 1
         elseif key == "s" then
@@ -37,8 +42,9 @@ function love.keypressed(key)
         targetX = math.max(0, math.min(GRID_WIDTH - 1, targetX))
         targetY = math.max(0, math.min(GRID_HEIGHT - 1, targetY))
 
-        -- Start the movement animation
-        isMoving = true
+        -- Start bounce animation
+        startX, startY = currentX, currentY
+        bounceProgress = 0
     end
 end
 
@@ -73,23 +79,31 @@ function getTriangleVertices(x, y, size, scale)
 end
 
 function love.update(dt)
-    -- Smoothly interpolate toward the target position
-    if isMoving then
-        local dx = (targetX * TILE_SIZE) - currentX
-        local dy = (targetY * TILE_SIZE) - currentY
+    if bounceProgress < 1 then
+        -- Update animation progress
+        bounceProgress = math.min(bounceProgress + dt / BOUNCE_DURATION, 1)
+
+        -- Calculate easing with overshoot
+        local t = bounceProgress
+        local easedT = t < 0.5 and 2 * t * t or -1 + (4 - 2 * t) * t -- Ease out cubic
+
+        -- Calculate overshoot direction
+        local dx = (targetX * TILE_SIZE - startX)
+        local dy = (targetY * TILE_SIZE - startY)
         local distance = math.sqrt(dx^2 + dy^2)
 
-        if distance < MOVE_SPEED * dt then
-            -- Snap to the target when close enough
+        local overshootFactor = OVERSHOOT * (1 - t)
+        local overshootX = dx / distance * overshootFactor * TILE_SIZE
+        local overshootY = dy / distance * overshootFactor * TILE_SIZE
+
+        -- Interpolate position with easing and directional overshoot
+        currentX = startX + dx * easedT + overshootX
+        currentY = startY + dy * easedT + overshootY
+    else
+        -- Ensure the character lands exactly at the target position when animation ends
+        if currentX ~= targetX * TILE_SIZE or currentY ~= targetY * TILE_SIZE then
             currentX = targetX * TILE_SIZE
             currentY = targetY * TILE_SIZE
-            isMoving = false
-        else
-            -- Continue moving toward the target
-            local directionX = dx / distance
-            local directionY = dy / distance
-            currentX = currentX + directionX * MOVE_SPEED * dt
-            currentY = currentY + directionY * MOVE_SPEED * dt
         end
     end
 end
