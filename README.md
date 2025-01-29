@@ -38,5 +38,7 @@ Rarer resources the lower you go.
 
 - Max number of tiles that can be discovered per run
 - Max number of tiles that a floor can contain
+- Increase max stack size of items
+- Increase max number of items retained on death
 - Max energy
 - Shovel: Allows the character to dig to a lower floor if they reach their lowest floor
