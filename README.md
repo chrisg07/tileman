@@ -11,6 +11,7 @@ To run the game on MacOS after installing Love: `open -n -a love "../tileman"`
 - FallenSword
 - Corekeeper Automation
 - Stardew Valley mine
+- Atypography: [TLOCRT](https://www.atypography.com/product-page/tlocrt-h-v-sq)
 
 ## Gameplay loop
 
