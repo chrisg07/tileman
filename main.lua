@@ -26,20 +26,22 @@ function love.keypressed(key)
         character:move(-1, 0, grid.width, grid.height)
     elseif key == "d" then
         character:move(1, 0, grid.width, grid.height)
+    elseif key == "m" then -- Toggle menu visibility
+        menu:toggle()
     end
 end
 
 function love.update(dt)
     character:update(dt, tileSize, bounceDuration, overshoot)
+    menu:update(dt) -- Update menu animations
 end
 
 function love.draw()
     grid:draw()
     character:draw(tileSize)
-    menu:draw()
+    menu:draw() -- Draw the menu only if it's visible
 end
 
--- Add this to handle mouse clicks
 function love.mousepressed(x, y, button)
     menu:mousepressed(x, y, button) -- Delegate mouse click handling to the menu
 end
