@@ -11,6 +11,14 @@ local Menu = require("menu")
 local State = require("state")
 
 function love.load()
+    -- Load the custom font
+    local fontPath = "fonts/TLOCRT-Squared.otf" -- Path to the font file
+    local fontSize = 24                         -- Desired font size
+    customFont = love.graphics.newFont(fontPath, fontSize)
+
+    -- Set the custom font as the default font
+    love.graphics.setFont(customFont)
+
     local state = State:new()                        -- Initialize the state
     grid = Grid:new(tileSize)
     character = Character:new(5, 5, tileSize, state) -- Pass state to Character
