@@ -13,7 +13,7 @@ local State = require("state")
 function love.load()
     -- Load the custom font
     local fontPath = "fonts/TLOCRT-Squared.otf" -- Path to the font file
-    local fontSize = 24                         -- Desired font size
+    local fontSize = 84                         -- Desired font size
     customFont = love.graphics.newFont(fontPath, fontSize)
 
     -- Set the custom font as the default font

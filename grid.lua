@@ -11,7 +11,7 @@ end
 function Grid:draw()
     for x = 0, self.width - 1 do
         for y = 0, self.height - 1 do
-            love.graphics.rectangle("line", x * self.tileSize, y * self.tileSize, self.tileSize, self.tileSize)
+            love.graphics.print("0", x * self.tileSize, y * self.tileSize)
         end
     end
 end
