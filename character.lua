@@ -19,7 +19,7 @@ function Character:new(x, y, tileSize, state, grid)
 end
 
 function Character:move(dx, dy)
-    if self.state:get("tiles") <= 0 then
+    if self.state:get("energy") <= 0 then
         return -- Prevent movement if counter is not positive
     end
 
@@ -29,9 +29,14 @@ function Character:move(dx, dy)
 
         -- Check if this is a new tile being discovered
         local tileKey = newX .. "," .. newY
-        if not self.grid.tiles[tileKey] then
+        if not self.grid.tiles[tileKey] and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
             self.grid:discoverTile(newX, newY, "grass")
-            self.state:decrement("tiles") -- Decrement tilesUnlocked when discovering a new tile
+            self.state:decrement("tiles")
+            self.state:decrement("energy")
+        elseif self.grid.tiles[tileKey] and self.state:get("energy") > 0 then
+            self.state:decrement("energy")
+        else
+            return
         end
 
         -- Maintain animation logic
@@ -40,9 +45,6 @@ function Character:move(dx, dy)
         self.startX = self.currentX
         self.startY = self.currentY
         self.bounceProgress = 0
-
-        -- Decrement movement counter
-        self.state:decrement("energy")
     end
 end
 
