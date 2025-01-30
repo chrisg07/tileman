@@ -4,21 +4,26 @@ State.__index = State
 
 function State:new()
     return setmetatable({
-        counter = 10 -- Initial value for the counter
+        tiles = 5,
+        energy = 100,
+        health = 50
     }, self)
 end
 
-function State:getCounter()
-    return self.counter
+function State:get(property)
+    return self[property] or 0
 end
 
-function State:incrementCounter()
-    self.counter = self.counter + 1
+function State:increment(property)
+    if self[property] then
+        self[property] = self[property] + 1
+    end
 end
 
-function State:decrementCounter()
-    if self.counter > 0 then
-        self.counter = self.counter - 1
+function State:decrement(property)
+    if self[property] and self[property] > 0 then
+        self[property] = self[property] - 1
+        print(property .. " decremented to " .. self[property]) -- Debugging output
     end
 end
 

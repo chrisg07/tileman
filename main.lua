@@ -19,10 +19,10 @@ function love.load()
     -- -- Set the custom font as the default font
     -- love.graphics.setFont(customFont)
 
-    local state = State:new()                              -- Initialize the state
+    state = State:new()                                    -- Initialize the state
     grid = Grid:new(tileSize)
     character = Character:new(5, 5, tileSize, state, grid) -- Pass state to Character
-    menu = Menu:new(state)                                 -- Pass state to Menu
+    menu = Menu:new(state, { "tiles", "energy", "health" })
 end
 
 function love.keypressed(key)
