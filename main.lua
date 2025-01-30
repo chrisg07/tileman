@@ -12,28 +12,28 @@ local State = require("state")
 
 function love.load()
     -- Load the custom font
-    local fontPath = "fonts/TLOCRT-Squared.otf" -- Path to the font file
-    local fontSize = 84                         -- Desired font size
-    customFont = love.graphics.newFont(fontPath, fontSize)
+    -- local fontPath = "fonts/TLOCRT-Squared.otf" -- Path to the font file
+    -- local fontSize = 84                         -- Desired font size
+    -- customFont = love.graphics.newFont(fontPath, fontSize)
 
-    -- Set the custom font as the default font
-    love.graphics.setFont(customFont)
+    -- -- Set the custom font as the default font
+    -- love.graphics.setFont(customFont)
 
-    local state = State:new()                        -- Initialize the state
+    local state = State:new()                              -- Initialize the state
     grid = Grid:new(tileSize)
-    character = Character:new(5, 5, tileSize, state) -- Pass state to Character
-    menu = Menu:new(state)                           -- Pass state to Menu
+    character = Character:new(5, 5, tileSize, state, grid) -- Pass state to Character
+    menu = Menu:new(state)                                 -- Pass state to Menu
 end
 
 function love.keypressed(key)
     if key == "w" then
-        character:move(0, -1, grid.width, grid.height)
+        character:move(0, -1)
     elseif key == "s" then
-        character:move(0, 1, grid.width, grid.height)
+        character:move(0, 1)
     elseif key == "a" then
-        character:move(-1, 0, grid.width, grid.height)
+        character:move(-1, 0)
     elseif key == "d" then
-        character:move(1, 0, grid.width, grid.height)
+        character:move(1, 0)
     elseif key == "m" then -- Toggle menu visibility
         menu:toggle()
     end

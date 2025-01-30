@@ -42,4 +42,5 @@ Rarer resources the lower you go.
 - Increase max stack size of items
 - Increase max number of items retained on death
 - Max energy
+- Fog of war radius
 - Shovel: Allows the character to dig to a lower floor if they reach their lowest floor

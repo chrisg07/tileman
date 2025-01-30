@@ -4,7 +4,7 @@ local Utils = require("utils")
 local Character = {}
 Character.__index = Character
 
-function Character:new(x, y, tileSize, state)
+function Character:new(x, y, tileSize, state, grid)
     return setmetatable({
         targetX = x,
         targetY = y,
@@ -13,22 +13,32 @@ function Character:new(x, y, tileSize, state)
         currentX = x * tileSize,
         currentY = y * tileSize,
         bounceProgress = 1,
-        state = state
+        state = state,
+        grid = grid -- Store reference to grid
     }, self)
 end
 
-function Character:move(dx, dy, gridWidth, gridHeight)
+function Character:move(dx, dy)
     if self.state:getCounter() <= 0 then
         return -- Prevent movement if counter is not positive
     end
 
-    if self.bounceProgress >= 1 then
-        self.targetX = math.max(0, math.min(gridWidth - 1, self.targetX + dx))
-        self.targetY = math.max(0, math.min(gridHeight - 1, self.targetY + dy))
+    if self.bounceProgress >= 1 and self.grid then -- Ensure grid is not nil
+        local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
+        local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
+
+        -- Discover the new tile
+        self.grid:discoverTile(newX, newY, "grass")
+
+        -- Maintain animation logic
+        self.targetX = newX
+        self.targetY = newY
         self.startX = self.currentX
         self.startY = self.currentY
         self.bounceProgress = 0
-        self.state:decrementCounter() -- Decrement the counter on movement
+
+        -- Decrement movement counter
+        self.state:decrementCounter()
     end
 end
 

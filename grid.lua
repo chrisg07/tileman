@@ -5,14 +5,31 @@ function Grid:new(tileSize)
     local screenWidth, screenHeight = love.graphics.getDimensions()
     local gridWidth = math.floor(screenWidth / tileSize)
     local gridHeight = math.floor(screenHeight / tileSize)
-    return setmetatable({ width = gridWidth, height = gridHeight, tileSize = tileSize }, self)
+
+    return setmetatable({
+        width = gridWidth,   -- Ensure width is set
+        height = gridHeight, -- Ensure height is set
+        tileSize = tileSize,
+        tiles = {}           -- Store discovered tiles
+    }, self)
+end
+
+function Grid:discoverTile(x, y, tileType)
+    local key = x .. "," .. y
+    if not self.tiles[key] then
+        self.tiles[key] = { type = tileType, discovered = true }
+    end
+end
+
+function Grid:isDiscovered(x, y)
+    return self.tiles[x .. "," .. y] ~= nil
 end
 
 function Grid:draw()
-    for x = 0, self.width - 1 do
-        for y = 0, self.height - 1 do
-            love.graphics.print("0", x * self.tileSize, y * self.tileSize)
-        end
+    for key, tile in pairs(self.tiles) do
+        local x, y = key:match("([^,]+),([^,]+)")
+        x, y = tonumber(x), tonumber(y)
+        love.graphics.print(tile.type or "?", x * self.tileSize, y * self.tileSize)
     end
 end
 
