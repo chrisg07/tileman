@@ -4,6 +4,7 @@ local moveSpeed = 200
 local bounceDuration = 0.2
 local overshoot = 1.1
 
+local suit = require "suit"
 local Grid = require("grid")
 local Character = require("character")
 local Utils = require("utils")
@@ -18,6 +19,9 @@ function love.load()
 
     -- -- Set the custom font as the default font
     -- love.graphics.setFont(customFont)
+
+    -- Set SUIT theme (optional)
+    suit.theme.color.normal = { bg = { 0.1, 0.1, 0.1 }, fg = { 1, 1, 1 } }
 
     state = State:new()                                    -- Initialize the state
     grid = Grid:new(tileSize)
@@ -42,12 +46,27 @@ end
 function love.update(dt)
     character:update(dt, tileSize, bounceDuration, overshoot)
     menu:update(dt) -- Update menu animations
+
+    -- Reset the layout position
+    suit.layout:reset(100, 100)
+
+    -- Create a button
+    if suit.Button("Button 1", suit.layout:row(200, 50)).hit then
+        print("Button 1 clicked!")
+    end
+
+    -- Create another button
+    if suit.Button("Button 2", suit.layout:row(200, 50)).hit then
+        print("Button 2 clicked!")
+    end
 end
 
 function love.draw()
     grid:draw()
     character:draw(tileSize)
     menu:draw() -- Draw the menu only if it's visible
+    -- Draw SUIT elements
+    suit.draw()
 end
 
 function love.mousepressed(x, y, button)
