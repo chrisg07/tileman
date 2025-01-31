@@ -46,26 +46,13 @@ end
 function love.update(dt)
     character:update(dt, tileSize, bounceDuration, overshoot)
     menu:update(dt) -- Update menu animations
-
-    -- Reset the layout position
-    suit.layout:reset(100, 100)
-
-    -- Create a button
-    if suit.Button("Button 1", suit.layout:row(200, 50)).hit then
-        print("Button 1 clicked!")
-    end
-
-    -- Create another button
-    if suit.Button("Button 2", suit.layout:row(200, 50)).hit then
-        print("Button 2 clicked!")
-    end
 end
 
 function love.draw()
     grid:draw()
     character:draw(tileSize)
-    menu:draw() -- Draw the menu only if it's visible
-    -- Draw SUIT elements
+    menu:draw()
+
     suit.draw()
 end
 

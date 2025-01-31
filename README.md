@@ -4,6 +4,8 @@
 
 To run the game on MacOS after installing Love: `open -n -a love "../tileman"`
 
+[SUIT](https://github.com/vrld/suit) is used for UI elements
+
 ## Inspiration
 
 - Balatro for language/framework

@@ -2,6 +2,8 @@
 local Menu = {}
 Menu.__index = Menu
 
+local suit = require "suit"
+
 local buttonX, buttonY = 100, 100
 local buttonWidth, buttonHeight = 200, 50
 local buttonSpacing = 60 -- Spacing between buttons
@@ -25,38 +27,48 @@ function Menu:update(dt)
     elseif not self.visible and self.alpha > 0 then
         self.alpha = math.max(self.alpha - dt * 4, 0) -- Fade out
     end
-end
 
-function Menu:draw()
-    if self.alpha <= 0 then
-        return
-    end
-
-    -- Draw menu background
-    love.graphics.setColor(0.1, 0.1, 0.1, 0.9 * self.alpha)
-    love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, #self.properties * buttonSpacing, 10)
+    -- Reset the layout position
+    suit.layout:reset(100, 100)
 
     -- Draw buttons for each property
     for i, property in ipairs(self.properties) do
-        local y = buttonY + (i - 1) * buttonSpacing
-        local value = self.state:get(property)                           -- Ensure it always reads the latest value
-        print("Menu displaying " .. property .. ": " .. tostring(value)) -- Debugging
-
-        -- Button background
-        love.graphics.setColor(0.2, 0.2, 0.2, self.alpha)
-        love.graphics.rectangle("fill", buttonX, y, buttonWidth, buttonHeight)
-
-        -- Button text
-        love.graphics.setColor(1, 1, 1, self.alpha)
-        love.graphics.print(property .. ": " .. tostring(value), buttonX + 10, y + 15)
+        if suit.Button(property .. ": " .. self.state[property], suit.layout:row(200, 50)).hit then
+            self.state[property] = (self.state[property] or 0) + 1
+        end
     end
+end
 
-    -- Draw close button
-    local closeButtonX, closeButtonY = buttonX + buttonWidth - 30, buttonY - 30
-    love.graphics.setColor(1, 0, 0, 1)
-    love.graphics.rectangle("fill", closeButtonX, closeButtonY, 20, 20)
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.print("X", closeButtonX + 5, closeButtonY + 5)
+function Menu:draw()
+    -- if self.alpha <= 0 then
+    --     return
+    -- end
+
+    -- -- Draw menu background
+    -- love.graphics.setColor(0.1, 0.1, 0.1, 0.9 * self.alpha)
+    -- love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, #self.properties * buttonSpacing, 10)
+
+    -- -- Draw buttons for each property
+    -- for i, property in ipairs(self.properties) do
+    --     local y = buttonY + (i - 1) * buttonSpacing
+    --     local value = self.state:get(property)                           -- Ensure it always reads the latest value
+    --     print("Menu displaying " .. property .. ": " .. tostring(value)) -- Debugging
+
+    --     -- Button background
+    --     love.graphics.setColor(0.2, 0.2, 0.2, self.alpha)
+    --     love.graphics.rectangle("fill", buttonX, y, buttonWidth, buttonHeight)
+
+    --     -- Button text
+    --     love.graphics.setColor(1, 1, 1, self.alpha)
+    --     love.graphics.print(property .. ": " .. tostring(value), buttonX + 10, y + 15)
+    -- end
+
+    -- -- Draw close button
+    -- local closeButtonX, closeButtonY = buttonX + buttonWidth - 30, buttonY - 30
+    -- love.graphics.setColor(1, 0, 0, 1)
+    -- love.graphics.rectangle("fill", closeButtonX, closeButtonY, 20, 20)
+    -- love.graphics.setColor(1, 1, 1, 1)
+    -- love.graphics.print("X", closeButtonX + 5, closeButtonY + 5)
 end
 
 function Menu:mousepressed(x, y, button)
