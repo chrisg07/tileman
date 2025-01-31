@@ -11,7 +11,16 @@ local Utils = require("utils")
 local Menu = require("menu")
 local State = require("state")
 
+local shader
+
 function love.load()
+    -- Load the Voronoi shader
+    shader = love.graphics.newShader("voronoi.frag")
+
+    -- Set shader resolution
+    local screenWidth, screenHeight = love.graphics.getDimensions()
+    shader:send("u_resolution", { screenWidth, screenHeight })
+
     -- Load the custom font
     -- local fontPath = "fonts/TLOCRT-Squared.otf" -- Path to the font file
     -- local fontSize = 84                         -- Desired font size
@@ -44,11 +53,22 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+    -- Update shader time for animation
+    shader:send("u_time", love.timer.getTime())
+
     character:update(dt, tileSize, bounceDuration, overshoot)
     menu:update(dt) -- Update menu animations
 end
 
 function love.draw()
+    -- Set the shader
+    love.graphics.setShader(shader)
+
+    -- Draw a full-screen rectangle to apply the shader
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+    -- Reset the shader
+    love.graphics.setShader()
     grid:draw()
 
     character:draw(tileSize)

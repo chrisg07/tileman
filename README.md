@@ -46,3 +46,4 @@ Rarer resources the lower you go.
 - Max energy
 - Fog of war radius
 - Shovel: Allows the character to dig to a lower floor if they reach their lowest floor
+- Boat: Ability to travel over water
