@@ -27,11 +27,32 @@ function Menu:update(dt)
     -- Reset the layout position
     suit.layout:reset(0, 0)
 
-    -- Draw buttons for each property
-    for i, property in ipairs(self.properties) do
-        if suit.Button(property .. ": " .. self.state[property], suit.layout:row(200, 25)).hit then
-            self.state[property] = (self.state[property] or 0) + 1
+    -- Draw the toggle button (only when menu is visible)
+    if self.visible then
+        if suit.Button("Close Menu", suit.layout:row(200, 25)).hit then
+            self:toggle() -- Close the menu when the button is clicked
         end
+    else
+        if suit.Button("Open Menu", suit.layout:row(200, 25)).hit then
+            self:toggle() -- Open the menu when the button is clicked
+        end
+    end
+
+    -- Draw buttons for each property (only when menu is visible)
+    if self.visible then
+        for i, property in ipairs(self.properties) do
+            if suit.Button(property .. ": " .. self.state[property], suit.layout:row(200, 25)).hit then
+                self.state[property] = (self.state[property] or 0) + 1
+            end
+        end
+    end
+end
+
+function Menu:draw()
+    -- Draw the menu background (only when visible)
+    if self.visible then
+        love.graphics.setColor(0.1, 0.1, 0.1, 0.9 * self.alpha)
+        love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     end
 end
 
