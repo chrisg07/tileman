@@ -20,7 +20,7 @@ end
 
 function Character:move(dx, dy)
     if self.state:get("energy") <= 0 then
-        return -- Prevent movement if counter is not positive
+        return -- Prevent movement if energy is not positive
     end
 
     if self.bounceProgress >= 1 and self.grid then -- Ensure grid is not nil
@@ -29,11 +29,11 @@ function Character:move(dx, dy)
 
         -- Check if this is a new tile being discovered
         local tileKey = newX .. "," .. newY
-        if not self.grid.tiles[tileKey] and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
-            self.grid:discoverTile(newX, newY, "grass")
+        if not self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
+            self.grid:discoverTile(newX, newY) -- Let the grid handle tile discovery
             self.state:decrement("tiles")
             self.state:decrement("energy")
-        elseif self.grid.tiles[tileKey] and self.state:get("energy") > 0 then
+        elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
             self.state:decrement("energy")
         else
             return

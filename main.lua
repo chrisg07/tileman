@@ -50,12 +50,8 @@ end
 
 function love.draw()
     grid:draw()
+
     character:draw(tileSize)
-    menu:draw()
 
     suit.draw()
-end
-
-function love.mousepressed(x, y, button)
-    menu:mousepressed(x, y, button) -- Delegate mouse click handling to the menu
 end
