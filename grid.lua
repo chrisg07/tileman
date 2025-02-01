@@ -6,7 +6,7 @@ local tileTypes = {
     { type = "grass", weight = 50 }, -- 50% chance
     { type = "sand",  weight = 30 }, -- 30% chance
     { type = "water", weight = 15 }, -- 15% chance
-    { type = "rock",  weight = 5 }   -- 5% chance
+    { type = "tree",  weight = 5 }   -- 5% chance
 }
 
 -- Weighted random selection function
@@ -33,20 +33,24 @@ function Grid:new(tileSize)
     local gridHeight = math.floor(screenHeight / tileSize)
 
     return setmetatable({
-        width = gridWidth,   -- Ensure width is set
-        height = gridHeight, -- Ensure height is set
+        width = gridWidth,
+        height = gridHeight,
         tileSize = tileSize,
-        tiles = {}           -- Store discovered tiles
+        tiles = {}
     }, self)
 end
 
 function Grid:discoverTile(x, y)
     local key = x .. "," .. y
     if not self.tiles[key] then
-        -- Select a random tile type based on weightings
         local tileType = getRandomTileType()
         self.tiles[key] = { type = tileType, discovered = true }
     end
+end
+
+function Grid:setTile(x, y, type)
+    local key = x .. "," .. y
+    self.tiles[key] = { type = type, discovered = true }
 end
 
 function Grid:isDiscovered(x, y)

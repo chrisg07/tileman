@@ -56,6 +56,18 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
         })
     end
 
+    -- Check if the tile is a tree.
+    local tileKey = tileX .. "," .. tileY
+    local tile = grid.tiles[tileKey]
+    if tile and tile.type == "tree" then
+        table.insert(self.actions, {
+            label = "Chop Tree",
+            callback = function()
+                character:chopTree(tileX, tileY)
+            end
+        })
+    end
+
     -- Always add a "Move Here" action.
     table.insert(self.actions, {
         label = "Move Here",

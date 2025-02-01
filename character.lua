@@ -106,6 +106,11 @@ function Character:draw(tileSize)
     love.graphics.polygon("fill", triangleVertices)
 end
 
+function Character:chopTree(tileX, tileY)
+    self.grid:setTile(tileX, tileY, "stump")
+    print("Tree chopped!")
+end
+
 function Character:attack(enemy)
     -- Example attack logic:
     print("Attacking enemy at (" .. enemy.x .. ", " .. enemy.y .. ")")
