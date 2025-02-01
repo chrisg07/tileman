@@ -4,83 +4,115 @@ ContextMenu.__index = ContextMenu
 
 local suit = require "suit"
 
-function ContextMenu:new()
+-- Create a new context menu.
+-- Optionally pass tileSize so the module can compute tile coordinates.
+function ContextMenu:new(tileSize)
     local self = setmetatable({}, ContextMenu)
     self.visible = false
     self.x = 0
     self.y = 0
-    self.type = nil          -- "attack" or "move"
-    self.targetedEnemy = nil -- if attacking
-    self.targetedTileX = nil -- if moving
-    self.targetedTileY = nil -- if moving
+    self.actions = {} -- List of actions (each with a label and callback)
+    self.tileSize = tileSize or 50
     return self
 end
 
--- Call this to display an attack menu at (x, y) targeting an enemy.
-function ContextMenu:showAttack(x, y, enemy)
-    self.visible = true
+-- Opens the context menu by determining what actions are available at the clicked position.
+-- It expects:
+--   x, y: the mouse click coordinates (pixels)
+--   grid: the grid module (for isDiscovered)
+--   enemies: the list of enemies
+--   character: the player character (to perform actions)
+--   state: the game state (for checking mode, energy, etc.)
+function ContextMenu:open(x, y, grid, enemies, character, state)
+    local tileX = math.floor(x / self.tileSize)
+    local tileY = math.floor(y / self.tileSize)
+
+    if not grid:isDiscovered(tileX, tileY) then
+        print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
+        return
+    end
+
     self.x = x
     self.y = y
-    self.type = "attack"
-    self.targetedEnemy = enemy
-end
+    self.actions = {} -- Clear previous actions
 
--- Call this to display a move menu at (x, y) targeting a tile.
-function ContextMenu:showMove(x, y, tileX, tileY)
+    -- Check if an enemy occupies the clicked tile.
+    local foundEnemy = nil
+    for _, enemy in ipairs(enemies) do
+        -- Assume enemy.x and enemy.y store the enemy's tile coordinates.
+        if enemy.x == tileX and enemy.y == tileY then
+            foundEnemy = enemy
+            break
+        end
+    end
+
+    -- If an enemy is present, add an "Attack" action.
+    if foundEnemy then
+        table.insert(self.actions, {
+            label = "Attack",
+            callback = function()
+                character:attack(foundEnemy)
+            end
+        })
+    end
+
+    -- Always add a "Move Here" action.
+    table.insert(self.actions, {
+        label = "Move Here",
+        callback = function()
+            local Pathfinding = require("pathfinding")
+            local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
+            if path then
+                local cost = #path - 1 -- Exclude the starting tile.
+                if state:get("energy") >= cost then
+                    state.energy = state.energy - cost
+                    print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
+                    character:setPath(path)
+                else
+                    print("Not enough energy to move!")
+                end
+            else
+                print("No valid path found!")
+            end
+        end
+    })
+
     self.visible = true
-    self.x = x
-    self.y = y
-    self.type = "move"
-    self.targetedTileX = tileX
-    self.targetedTileY = tileY
 end
 
+-- This method can be called from love.mousepressed to let the context menu handle the right-click.
+-- Pass in all necessary dependencies.
+function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
+    if state.mode == "game" and button == 2 then -- Right-click in game mode
+        self:open(x, y, grid, enemies, character, state)
+    end
+end
+
+-- Hide the context menu.
 function ContextMenu:hide()
     self.visible = false
-    self.type = nil
-    self.targetedEnemy = nil
-    self.targetedTileX = nil
-    self.targetedTileY = nil
+    self.actions = {}
 end
 
 -- Update the context menu UI using SUIT.
--- Note: Pass in any dependencies (like character, grid, state) so the module can perform actions.
-function ContextMenu:update(dt, character, grid, state)
+function ContextMenu:update(dt)
     if self.visible then
         suit.layout:reset(self.x, self.y)
-        if self.type == "attack" then
-            if suit.Button("Attack", suit.layout:row(100, 30)).hit then
-                character:attack(self.targetedEnemy)
-                self:hide()
-            end
-        elseif self.type == "move" then
-            if suit.Button("Move Here", suit.layout:row(100, 30)).hit then
-                local Pathfinding = require("pathfinding")
-                local path = Pathfinding.findPath(grid, character.targetX, character.targetY, self.targetedTileX,
-                    self.targetedTileY)
-                if path then
-                    local cost = #path - 1 -- Exclude the starting tile.
-                    if state:get("energy") >= cost then
-                        state.energy = state.energy - cost
-                        print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
-                        character:setPath(path)
-                    else
-                        print("Not enough energy to move!")
-                    end
-                else
-                    print("No valid path found!")
-                end
+        for i, action in ipairs(self.actions) do
+            if suit.Button(action.label, suit.layout:row(100, 30)).hit then
+                action.callback()
                 self:hide()
             end
         end
     end
 end
 
+-- Optionally, draw a background behind the context menu.
 function ContextMenu:draw()
     if self.visible then
-        -- Optionally draw a background behind the menu (e.g., a semi-transparent rectangle)
         love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
-        love.graphics.rectangle("fill", self.x, self.y, 100, 30) -- Example size; adjust as needed.
+        local menuHeight = (#self.actions) * 30
+        love.graphics.rectangle("fill", self.x, self.y, 100, menuHeight)
         love.graphics.setColor(1, 1, 1)
     end
 end
