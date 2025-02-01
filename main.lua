@@ -61,14 +61,11 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- Set the shader
+    love.graphics.setBlendMode("alpha") -- Enable alpha blending
     love.graphics.setShader(shader)
-
-    -- Draw a full-screen rectangle to apply the shader
     love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-
-    -- Reset the shader
     love.graphics.setShader()
+
     grid:draw()
 
     character:draw(tileSize)

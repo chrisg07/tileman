@@ -28,7 +28,7 @@ float voronoi(vec2 p) {
             vec3 random = hash3(i + neighbor); // Random offset for each cell
 
             // Animate the random points using time
-            vec2 point = neighbor + 0.5 + 0.5 * sin(u_time * 0.1 + 6.2831 * random.xy) - f;
+            vec2 point = neighbor + 0.5 + 0.5 * sin(u_time + 6.2831 * random.xy) - f;
             float dist = length(point);
 
             if (dist < min_dist) {
@@ -46,7 +46,11 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
 
     float f = voronoi(uv); // Generate Voronoi pattern
 
-    // Visualize the Voronoi diagram
-    vec3 col = vec3(f); // Use distance to color the cells
-    return vec4(col, 1.0);
+    // Muted colors
+    vec3 col = vec3(f * 0.1, f * 0.3, f * 0.7); // Blueish tint
+
+    // Add transparency
+    float alpha = 0.2; // Set alpha value (0.0 = fully transparent, 1.0 = fully opaque)
+
+    return vec4(col, alpha);
 }
