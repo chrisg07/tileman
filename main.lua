@@ -4,6 +4,12 @@ local moveSpeed = 200
 local bounceDuration = 0.2
 local overshoot = 1.1
 
+-- context menu
+local contextMenuVisible = false
+local contextMenuX, contextMenuY = 0, 0
+local targetedEnemy = nil
+
+-- imports
 local suit = require "suit"
 local Grid = require("grid")
 local Character = require("character")
@@ -97,6 +103,17 @@ function love.update(dt)
     else -- state.mode == "menu"
         menu:update(dt)
     end
+
+    -- If the context menu is visible, update its UI using SUIT.
+    if contextMenuVisible then
+        suit.layout:reset(contextMenuX, contextMenuY)
+        if suit.Button("Attack", suit.layout:row(100, 30)).hit then
+            character:attack(targetedEnemy)
+            contextMenuVisible = false -- Hide the context menu after the action
+        end
+
+        -- Optionally, you might add a Cancel button or hide the menu if the user clicks elsewhere.
+    end
 end
 
 function love.draw()
@@ -113,4 +130,21 @@ function love.draw()
     end
 
     suit.draw()
+end
+
+function love.mousepressed(x, y, button)
+    if state.mode == "game" then
+        if button == 2 then -- Right-click
+            for _, enemy in ipairs(enemies) do
+                local ex, ey = enemy.currentX, enemy.currentY
+                if x >= ex and x <= ex + tileSize and y >= ey and y <= ey + tileSize then
+                    contextMenuVisible = true
+                    contextMenuX, contextMenuY = x, y
+                    targetedEnemy = enemy
+                    return
+                end
+            end
+            contextMenuVisible = false
+        end
+    end
 end

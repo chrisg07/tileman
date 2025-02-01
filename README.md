@@ -32,6 +32,10 @@ Ideally the character would move around the base to interact with various buildi
 Certain upgrades would be centered around taking gear on a run and setting up a machine or some other mechanic on a specific tile/floor.
 
 ### Energy
+
+Movement cost may increase on lower floors
+Combat will require energy. Energy cost will be determined by max hit.
+
 ### Floors
 
 Rarer resources the lower you go.

@@ -76,4 +76,11 @@ function Character:draw(tileSize)
     love.graphics.polygon("fill", triangleVertices)
 end
 
+function Character:attack(enemy)
+    -- Example attack logic:
+    print("Attacking enemy at (" .. enemy.x .. ", " .. enemy.y .. ")")
+    -- Here you might reduce the enemy's health or remove the enemy from the enemies table.
+    -- You could also trigger an animation or change game state to a combat phase.
+end
+
 return Character

@@ -24,7 +24,7 @@ end
 function State:decrement(property)
     if self[property] and self[property] > 0 then
         self[property] = self[property] - 1
-        print(property .. " decremented to " .. self[property]) -- Debugging output
+        print(property .. " decremented to " .. self[property])
     end
 end
 
