@@ -1,43 +1,4 @@
-// The MIT License
-// https://www.youtube.com/c/InigoQuilez
-// https://iquilezles.org/
-// Copyright © 2014 Inigo Quilez
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-// This is a procedural pattern that has 2 parameters, that generalizes cell-noise, 
-// perlin-noise and voronoi, all of which can be written in terms of the former as:
-//
-// cellnoise(x) = pattern(0,0,x)
-// perlin(x) = pattern(0,1,x)
-// voronoi(x) = pattern(1,0,x)
-//
-// From this generalization of the three famouse patterns, a new one (which I call 
-// "Voronoise") emerges naturally. It's like perlin noise a bit, but within a jittered 
-// grid like voronoi):
-//
-// voronoise(x) = pattern(1,1,x)
-//
-// Not sure what one would use this generalization for, because it's slightly slower 
-// than perlin or voronoise (and certainly much slower than cell noise), and in the 
-// end as a shading TD you just want one or another depending of the type of visual 
-// features you are looking for, I can't see a blending being needed in real life.  
-// But well, if only for the math fun it was worth trying. And they say a bit of 
-// mathturbation can be healthy anyway!
-//
-// More info here: https://iquilezles.org/articles/voronoise
-
-// More Voronoi shaders:
-//
-// Exact edges:  https://www.shadertoy.com/view/ldl3W8
-// Hierarchical: https://www.shadertoy.com/view/Xll3zX
-// Smooth:       https://www.shadertoy.com/view/ldB3zc
-// Voronoise:    https://www.shadertoy.com/view/Xd23Dh
-
-// All noise functions here:
-//
-// https://www.shadertoy.com/playlist/fXlXzf&from=0&num=12
-
+// voronoi.frag
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -54,34 +15,38 @@ vec3 hash3(vec2 p) {
     return fract(sin(q) * 43758.5453);
 }
 
-float voronoise(vec2 p, float u, float v) {
-    float k = 1.0 + 63.0 * pow(1.0 - v, 6.0);
-
+float voronoi(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
-    
-    vec2 a = vec2(0.0, 0.0);
-    for (int y = -2; y <= 2; y++)
-    for (int x = -2; x <= 2; x++) {
-        vec2 g = vec2(x, y);
-        vec3 o = hash3(i + g) * vec3(u, u, 1.0);
-        vec2 d = g - f + o.xy;
-        float w = pow(1.0 - smoothstep(0.0, 1.414, length(d)), k);
-        a += vec2(o.z * w, w);
+
+    float min_dist = 1.0; // Minimum distance to a point
+
+    // Iterate over neighboring cells
+    for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x <= 1; x++) {
+            vec2 neighbor = vec2(x, y);
+            vec3 random = hash3(i + neighbor); // Random offset for each cell
+
+            // Animate the random points using time
+            vec2 point = neighbor + 0.5 + 0.5 * sin(u_time * 0.1 + 6.2831 * random.xy) - f;
+            float dist = length(point);
+
+            if (dist < min_dist) {
+                min_dist = dist; // Update minimum distance
+            }
+        }
     }
-    
-    return a.x / a.y;
+
+    return min_dist;
 }
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
     vec2 uv = screen_coords / u_resolution;
+    uv *= 10.0; // Scale the UV coordinates to control the cell size
 
-    vec2 p = 0.5 - 0.5 * cos(u_time + vec2(0.0, 2.0));
-    p = p * p * (3.0 - 2.0 * p);
-    p = p * p * (3.0 - 2.0 * p);
-    p = p * p * (3.0 - 2.0 * p);
+    float f = voronoi(uv); // Generate Voronoi pattern
 
-    float f = voronoise(24.0 * uv, p.x, p.y);
-    
-    return vec4(vec3(f), 1.0);
+    // Visualize the Voronoi diagram
+    vec3 col = vec3(f); // Use distance to color the cells
+    return vec4(col, 1.0);
 }
