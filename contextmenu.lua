@@ -83,7 +83,7 @@ end
 -- This method can be called from love.mousepressed to let the context menu handle the right-click.
 -- Pass in all necessary dependencies.
 function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
-    if state.mode == "game" and button == 2 then -- Right-click in game mode
+    if button == 2 then -- Right-click in game mode
         self:open(x, y, grid, enemies, character, state)
     end
 end

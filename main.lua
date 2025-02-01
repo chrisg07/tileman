@@ -52,62 +52,47 @@ function love.load()
 end
 
 function love.keypressed(key)
-    if state.mode == "game" then
-        if key == "w" then
-            character:move(0, -1)
-        elseif key == "s" then
-            character:move(0, 1)
-        elseif key == "a" then
-            character:move(-1, 0)
-        elseif key == "d" then
-            character:move(1, 0)
-        elseif key == "m" then
-            menu:toggle() -- If you want to show an in-game menu overlay
-        end
-    elseif state.mode == "menu" then
-        -- When in menu mode, allow menu interaction.
-        -- For example, pressing Enter might start the game.
-        if key == "return" then
-            state.mode = "game"
-            -- Optionally reset other game properties here, such as:
-            -- state.health = 1
-            -- Reset character and enemy positions if needed.
-        end
+    if key == "w" then
+        character:move(0, -1)
+    elseif key == "s" then
+        character:move(0, 1)
+    elseif key == "a" then
+        character:move(-1, 0)
+    elseif key == "d" then
+        character:move(1, 0)
+    elseif key == "m" then
+        menu:toggle() -- If you want to show an in-game menu overlay
+    end
 
-        -- You can also let your menu handle its own key events if implemented:
-        if menu.keypressed then
-            menu:keypressed(key)
-        end
+    -- You can also let your menu handle its own key events if implemented:
+    if menu.keypressed then
+        menu:keypressed(key)
     end
 end
 
 function love.update(dt)
     background:update(dt)
 
-    if state.mode == "game" then
-        character:update(dt, tileSize, bounceDuration, overshoot)
+    character:update(dt, tileSize, bounceDuration, overshoot)
 
-        -- When the character moves, trigger enemy moves once.
-        if character.hasMoved then
-            for _, enemy in ipairs(enemies) do
-                enemy:triggerMove(grid)
-            end
-            character.hasMoved = false
-        end
-
-        -- Update enemies continuously for their interpolation and collision check.
+    -- When the character moves, trigger enemy moves once.
+    if character.hasMoved then
         for _, enemy in ipairs(enemies) do
-            enemy:update(dt, grid, character)
+            enemy:triggerMove(grid)
         end
-
-        -- Check if the character's health has dropped to zero.
-        if state.health <= 0 then
-            state.mode = "menu"
-            -- Optionally, reset your game objects here for a new game session.
-        end
-    else -- state.mode == "menu"
-        menu:update(dt)
+        character.hasMoved = false
     end
+
+    -- Update enemies continuously for their interpolation and collision check.
+    for _, enemy in ipairs(enemies) do
+        enemy:update(dt, grid, character)
+    end
+
+    -- Check if the character's health has dropped to zero.
+    if state.health <= 0 then
+        -- Optionally, reset your game objects here for a new game session.
+    end
+    menu:update(dt)
 
     contextMenu:update(dt, character, grid, state)
 end
@@ -115,15 +100,12 @@ end
 function love.draw()
     background:draw()
 
-    if state.mode == "game" then
-        grid:draw()
-        character:draw(tileSize)
-        for _, enemy in ipairs(enemies) do
-            enemy:draw()
-        end
-    elseif state.mode == "menu" then
-        menu:draw()
+    grid:draw()
+    character:draw(tileSize)
+    for _, enemy in ipairs(enemies) do
+        enemy:draw()
     end
+    menu:draw()
 
     contextMenu:draw()
     suit.draw()

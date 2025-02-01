@@ -27,11 +27,6 @@ function Menu:update(dt)
     suit.layout:reset(0, 0)
 
     if self.visible then
-        if suit.Button("Start Game", suit.layout:row(200, 25)).hit then
-            self.state.mode = "game"
-            self:toggle()
-        end
-
         if suit.Button("Close Menu", suit.layout:row(200, 25)).hit then
             self:toggle()
         end
