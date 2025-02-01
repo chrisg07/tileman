@@ -70,15 +70,18 @@ function Pathfinding.findPath(grid, startX, startY, goalX, goalY)
             local neighborHash = hash(neighbor)
             if not closedSet[neighborHash] then
                 local tentative_g = current.g + 1
-                local inOpenSet = openSetHash[neighborHash]
-                if (not inOpenSet) or (tentative_g < neighbor.g) then
-                    neighbor.g = tentative_g
-                    neighbor.h = heuristic(neighbor.x, neighbor.y, goal.x, goal.y)
-                    neighbor.f = neighbor.g + neighbor.h
+                -- If the neighbor is already in the open set, use that node.
+                local neighborNode = openSetHash[neighborHash] or neighbor
+
+                if (not openSetHash[neighborHash]) or (tentative_g < neighborNode.g) then
+                    neighborNode.g = tentative_g
+                    neighborNode.h = heuristic(neighborNode.x, neighborNode.y, goal.x, goal.y)
+                    neighborNode.f = neighborNode.g + neighborNode.h
                     cameFrom[neighborHash] = current
-                    if not inOpenSet then
-                        table.insert(openSet, neighbor)
-                        openSetHash[neighborHash] = neighbor
+
+                    if not openSetHash[neighborHash] then
+                        table.insert(openSet, neighborNode)
+                        openSetHash[neighborHash] = neighborNode
                     end
                 end
             end
