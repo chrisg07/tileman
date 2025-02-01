@@ -4,9 +4,9 @@ State.__index = State
 
 function State:new()
     return setmetatable({
-        tiles = 5,
-        energy = 100,
-        health = 50
+        tiles = 0,
+        energy = 0,
+        health = 1
     }, self)
 end
 

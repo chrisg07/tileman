@@ -5,6 +5,8 @@ local Character = {}
 Character.__index = Character
 
 function Character:new(x, y, tileSize, state, grid)
+    grid:discoverTile(x, y) -- Let the grid handle tile discovery
+
     return setmetatable({
         targetX = x,
         targetY = y,
@@ -27,8 +29,6 @@ function Character:move(dx, dy)
         local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
         local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
 
-        -- Check if this is a new tile being discovered
-        local tileKey = newX .. "," .. newY
         if not self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
             self.grid:discoverTile(newX, newY) -- Let the grid handle tile discovery
             self.state:decrement("tiles")

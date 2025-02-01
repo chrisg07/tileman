@@ -7,12 +7,13 @@ local overshoot = 1.1
 local suit = require "suit"
 local Grid = require("grid")
 local Character = require("character")
-local Utils = require("utils")
 local Menu = require("menu")
 local State = require("state")
 local Background = require("background")
 
-local shader
+local grid
+local character
+local menu
 local background
 
 function love.load()
