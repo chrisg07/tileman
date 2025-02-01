@@ -17,8 +17,17 @@ function Character:new(x, y, tileSize, state, grid)
         bounceProgress = 1,
         state = state,
         grid = grid,
-        hasMoved = false
+        hasMoved = false,
+        path = nil,      -- Holds the current path (if any)
+        pathIndex = nil, -- Index of the next node in the path
     }, self)
+end
+
+function Character:setPath(path)
+    self.path = path
+    -- Assuming the first node in the path is the current position,
+    -- start from the second node.
+    self.pathIndex = 2
 end
 
 function Character:move(dx, dy)
@@ -53,6 +62,23 @@ function Character:move(dx, dy)
 end
 
 function Character:update(dt, tileSize, bounceDuration, overshoot)
+    -- If a path is set and the character is not mid-move, trigger the next step.
+    if self.path and self.pathIndex then
+        if self.bounceProgress >= 1 and self.pathIndex <= #self.path then
+            local nextTile = self.path[self.pathIndex]
+            local dx = nextTile.x - self.targetX
+            local dy = nextTile.y - self.targetY
+            self:move(dx, dy)
+            self.pathIndex = self.pathIndex + 1
+        end
+        if self.pathIndex and self.pathIndex > #self.path then
+            -- Path complete.
+            self.path = nil
+            self.pathIndex = nil
+        end
+    end
+
+    -- Existing animation logic.
     if self.bounceProgress < 1 then
         self.bounceProgress = math.min(self.bounceProgress + dt / bounceDuration, 1)
         local t = self.bounceProgress
@@ -61,8 +87,12 @@ function Character:update(dt, tileSize, bounceDuration, overshoot)
         local dy = (self.targetY * tileSize - self.startY)
         local distance = math.sqrt(dx ^ 2 + dy ^ 2)
         local overshootFactor = overshoot * (1 - t)
-        local overshootX = dx / distance * overshootFactor * tileSize
-        local overshootY = dy / distance * overshootFactor * tileSize
+        local overshootX = 0
+        local overshootY = 0
+        if distance > 0 then
+            overshootX = dx / distance * overshootFactor * tileSize
+            overshootY = dy / distance * overshootFactor * tileSize
+        end
         self.currentX = self.startX + dx * easedT + overshootX
         self.currentY = self.startY + dy * easedT + overshootY
     else

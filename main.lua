@@ -115,11 +115,26 @@ function love.update(dt)
             end
         elseif contextMenuType == "move" then
             if suit.Button("Move Here", suit.layout:row(100, 30)).hit then
-                -- Calculate relative movement (dx,dy) from the current tile:
-                local dx = targetedTileX - character.targetX
-                local dy = targetedTileY - character.targetY
-                character:move(dx, dy)
-                contextMenuVisible = false -- Hide after action
+                local Pathfinding = require("pathfinding")
+                -- Compute the path from the character's current tile to the targeted tile.
+                local path = Pathfinding.findPath(grid, character.targetX, character.targetY, targetedTileX,
+                    targetedTileY)
+                if path then
+                    -- Calculate the energy cost: cost per tile moved (for example, 1 energy per tile).
+                    local cost = #path - 1 -- Exclude the starting tile.
+                    if state:get("energy") >= cost then
+                        -- Deduct energy.
+                        state.energy = state.energy - cost
+                        print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
+                        -- Set the character to follow the path.
+                        character:setPath(path)
+                    else
+                        print("Not enough energy to move!")
+                    end
+                else
+                    print("No valid path found!")
+                end
+                contextMenuVisible = false
             end
         end
     end

@@ -1,0 +1,91 @@
+-- pathfinding.lua
+local Pathfinding = {}
+
+-- Heuristic: Manhattan distance.
+local function heuristic(x1, y1, x2, y2)
+    return math.abs(x1 - x2) + math.abs(y1 - y2)
+end
+
+-- Returns neighbors that are within grid bounds and discovered.
+local function getNeighbors(node, grid)
+    local neighbors = {}
+    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+    for _, d in ipairs(dirs) do
+        local nx, ny = node.x + d[1], node.y + d[2]
+        if nx >= 0 and nx < grid.width and ny >= 0 and ny < grid.height then
+            if grid:isDiscovered(nx, ny) then
+                table.insert(neighbors, { x = nx, y = ny })
+            end
+        end
+    end
+    return neighbors
+end
+
+-- Reconstructs the path from the cameFrom table.
+local function reconstructPath(cameFrom, current)
+    local path = { current }
+    local function hash(n) return n.x .. "," .. n.y end
+    while cameFrom[hash(current)] do
+        current = cameFrom[hash(current)]
+        table.insert(path, 1, current)
+    end
+    return path
+end
+
+-- findPath returns a list of nodes (each with x and y) from start to goal.
+function Pathfinding.findPath(grid, startX, startY, goalX, goalY)
+    local start       = { x = startX, y = startY }
+    local goal        = { x = goalX, y = goalY }
+
+    local openSet     = {} -- List of nodes to evaluate.
+    local openSetHash = {} -- For quick lookup.
+    local cameFrom    = {} -- For reconstructing the path.
+
+    local function hash(node)
+        return node.x .. "," .. node.y
+    end
+
+    start.g = 0
+    start.h = heuristic(start.x, start.y, goal.x, goal.y)
+    start.f = start.g + start.h
+    table.insert(openSet, start)
+    openSetHash[hash(start)] = start
+
+    local closedSet = {}
+
+    while #openSet > 0 do
+        -- Get the node with the lowest f score.
+        table.sort(openSet, function(a, b) return a.f < b.f end)
+        local current = table.remove(openSet, 1)
+        openSetHash[hash(current)] = nil
+
+        if current.x == goal.x and current.y == goal.y then
+            return reconstructPath(cameFrom, current)
+        end
+
+        closedSet[hash(current)] = true
+
+        local neighbors = getNeighbors(current, grid)
+        for _, neighbor in ipairs(neighbors) do
+            local neighborHash = hash(neighbor)
+            if not closedSet[neighborHash] then
+                local tentative_g = current.g + 1
+                local inOpenSet = openSetHash[neighborHash]
+                if (not inOpenSet) or (tentative_g < neighbor.g) then
+                    neighbor.g = tentative_g
+                    neighbor.h = heuristic(neighbor.x, neighbor.y, goal.x, goal.y)
+                    neighbor.f = neighbor.g + neighbor.h
+                    cameFrom[neighborHash] = current
+                    if not inOpenSet then
+                        table.insert(openSet, neighbor)
+                        openSetHash[neighborHash] = neighbor
+                    end
+                end
+            end
+        end
+    end
+
+    return nil -- No valid path found.
+end
+
+return Pathfinding
