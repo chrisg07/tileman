@@ -76,11 +76,9 @@ function love.update(dt)
     if state.mode == "game" then
         character:update(dt, tileSize, bounceDuration, overshoot)
 
-        if character.hasMoved then
-            for _, enemy in ipairs(enemies) do
-                enemy:update(dt, grid, character)
-            end
-            character.hasMoved = false
+        -- Update all enemies every frame so that their bounce progress advances.
+        for _, enemy in ipairs(enemies) do
+            enemy:update(dt, grid, character)
         end
 
         -- Check if the character's health has dropped to zero.
@@ -88,7 +86,7 @@ function love.update(dt)
             state.mode = "menu"
             -- Optionally, reset your game objects here for a new game session.
         end
-    else -- state.mode == "menu"
+    elseif state.mode == "menu" then
         menu:update(dt)
     end
 end
