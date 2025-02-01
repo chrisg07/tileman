@@ -4,6 +4,7 @@ State.__index = State
 
 function State:new()
     return setmetatable({
+        mode = "menu",
         tiles = 0,
         energy = 0,
         health = 1

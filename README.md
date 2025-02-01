@@ -42,6 +42,7 @@ Rarer resources the lower you go.
 - Max number of tiles that can be discovered per run
 - Max number of tiles that a floor can contain
 - Increase max stack size of items
+- Increase backpack size
 - Increase max number of items retained on death
 - Max energy
 - Fog of war radius

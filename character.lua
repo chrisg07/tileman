@@ -5,7 +5,7 @@ local Character = {}
 Character.__index = Character
 
 function Character:new(x, y, tileSize, state, grid)
-    grid:discoverTile(x, y) -- Let the grid handle tile discovery
+    grid:discoverTile(x, y)
 
     return setmetatable({
         targetX = x,
@@ -16,21 +16,22 @@ function Character:new(x, y, tileSize, state, grid)
         currentY = y * tileSize,
         bounceProgress = 1,
         state = state,
-        grid = grid -- Store reference to grid
+        grid = grid,
+        hasMoved = false
     }, self)
 end
 
 function Character:move(dx, dy)
     if self.state:get("energy") <= 0 then
-        return -- Prevent movement if energy is not positive
+        return
     end
 
-    if self.bounceProgress >= 1 and self.grid then -- Ensure grid is not nil
+    if self.bounceProgress >= 1 and self.grid then
         local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
         local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
 
         if not self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
-            self.grid:discoverTile(newX, newY) -- Let the grid handle tile discovery
+            self.grid:discoverTile(newX, newY)
             self.state:decrement("tiles")
             self.state:decrement("energy")
         elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
@@ -45,6 +46,9 @@ function Character:move(dx, dy)
         self.startX = self.currentX
         self.startY = self.currentY
         self.bounceProgress = 0
+
+        self.hasMoved = true
+        print("Player moved! hasMoved = true")
     end
 end
 

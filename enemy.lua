@@ -18,9 +18,10 @@ function Enemy:new(x, y, tileSize, speed)
     }, self)
 end
 
-function Enemy:update(dt, grid)
-    -- Simple AI: Move towards the player or randomly
-    if self.bounceProgress >= 1 then
+function Enemy:update(dt, grid, character)
+    -- Only move if the player has moved
+    if character.hasMoved and self.bounceProgress >= 1 then
+        print("Enemy moving!")
         local dx, dy = 0, 0
 
         -- Random movement (for now)
@@ -58,6 +59,7 @@ function Enemy:update(dt, grid)
         self.y = self.targetY
         self.currentX = self.x * self.tileSize
         self.currentY = self.y * self.tileSize
+        print("Enemy reached target:", self.currentX, self.currentY)
     end
 end
 
