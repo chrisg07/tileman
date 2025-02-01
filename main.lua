@@ -19,10 +19,12 @@ local Menu = require("menu")
 local State = require("state")
 local Background = require("background")
 local Enemy = require("enemy")
+local ContextMenu = require "contextmenu"
 
 local grid
 local character
 local menu
+local contextMenu
 local background
 local enemies = {}
 
@@ -44,6 +46,7 @@ function love.load()
     grid = Grid:new(tileSize)
     character = Character:new(5, 5, tileSize, state, grid)
     menu = Menu:new(state, { "tiles", "energy", "health" })
+    contextMenu = ContextMenu:new()
 
     table.insert(enemies, Enemy:new(10, 10, tileSize, 0.5))
 end
@@ -106,38 +109,7 @@ function love.update(dt)
         menu:update(dt)
     end
 
-    if contextMenuVisible then
-        suit.layout:reset(contextMenuX, contextMenuY)
-        if contextMenuType == "attack" then
-            if suit.Button("Attack", suit.layout:row(100, 30)).hit then
-                character:attack(targetedEnemy)
-                contextMenuVisible = false -- Hide after action
-            end
-        elseif contextMenuType == "move" then
-            if suit.Button("Move Here", suit.layout:row(100, 30)).hit then
-                local Pathfinding = require("pathfinding")
-                -- Compute the path from the character's current tile to the targeted tile.
-                local path = Pathfinding.findPath(grid, character.targetX, character.targetY, targetedTileX,
-                    targetedTileY)
-                if path then
-                    -- Calculate the energy cost: cost per tile moved (for example, 1 energy per tile).
-                    local cost = #path - 1 -- Exclude the starting tile.
-                    if state:get("energy") >= cost then
-                        -- Deduct energy.
-                        state.energy = state.energy - cost
-                        print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
-                        -- Set the character to follow the path.
-                        character:setPath(path)
-                    else
-                        print("Not enough energy to move!")
-                    end
-                else
-                    print("No valid path found!")
-                end
-                contextMenuVisible = false
-            end
-        end
-    end
+    contextMenu:update(dt, character, grid, state)
 end
 
 function love.draw()
@@ -153,6 +125,7 @@ function love.draw()
         menu:draw()
     end
 
+    contextMenu:draw()
     suit.draw()
 end
 
@@ -160,29 +133,21 @@ function love.mousepressed(x, y, button)
     if state.mode == "game" then
         if button == 2 then -- Right-click
             local clickedOnEnemy = false
-
-            -- First, check if the click is over any enemy.
+            -- Check if click is over an enemy.
             for _, enemy in ipairs(enemies) do
                 local ex, ey = enemy.currentX, enemy.currentY
                 if x >= ex and x <= ex + tileSize and y >= ey and y <= ey + tileSize then
-                    contextMenuVisible = true
-                    contextMenuX, contextMenuY = x, y
-                    targetedEnemy = enemy
-                    contextMenuType = "attack"
+                    contextMenu:showAttack(x, y, enemy)
                     clickedOnEnemy = true
                     break
                 end
             end
 
-            -- If not on an enemy, check if the click is on a discovered tile.
             if not clickedOnEnemy then
                 local tileX = math.floor(x / tileSize)
                 local tileY = math.floor(y / tileSize)
                 if grid:isDiscovered(tileX, tileY) then
-                    contextMenuVisible = true
-                    contextMenuX, contextMenuY = x, y
-                    targetedTileX, targetedTileY = tileX, tileY
-                    contextMenuType = "move"
+                    contextMenu:showMove(x, y, tileX, tileY)
                 else
                     print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
                 end
