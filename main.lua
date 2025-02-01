@@ -164,17 +164,12 @@ function love.mousepressed(x, y, button)
                 local tileX = math.floor(x / tileSize)
                 local tileY = math.floor(y / tileSize)
                 if grid:isDiscovered(tileX, tileY) then
-                    -- Only allow movement if the tile is adjacent to the character's current target.
-                    local currentTileX = character.targetX
-                    local currentTileY = character.targetY
-                    if math.abs(tileX - currentTileX) + math.abs(tileY - currentTileY) == 1 then
-                        contextMenuVisible = true
-                        contextMenuX, contextMenuY = x, y
-                        targetedTileX, targetedTileY = tileX, tileY
-                        contextMenuType = "move"
-                    else
-                        print("Selected tile is not adjacent!")
-                    end
+                    contextMenuVisible = true
+                    contextMenuX, contextMenuY = x, y
+                    targetedTileX, targetedTileY = tileX, tileY
+                    contextMenuType = "move"
+                else
+                    print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
                 end
             end
         end
