@@ -130,28 +130,25 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
-    if state.mode == "game" then
-        if button == 2 then -- Right-click
-            local clickedOnEnemy = false
-            -- Check if click is over an enemy.
-            for _, enemy in ipairs(enemies) do
-                local ex, ey = enemy.currentX, enemy.currentY
-                if x >= ex and x <= ex + tileSize and y >= ey and y <= ey + tileSize then
-                    contextMenu:showAttack(x, y, enemy)
-                    clickedOnEnemy = true
-                    break
-                end
+    local clickedOnEnemy = false
+    if state.mode == "game" and button == 2 then
+        for _, enemy in ipairs(enemies) do
+            local ex, ey = enemy.currentX, enemy.currentY
+            if x >= ex and x <= ex + tileSize and y >= ey and y <= ey + tileSize then
+                contextMenu:showAttack(x, y, enemy)
+                clickedOnEnemy = true
+                break
             end
+        end
+    end
 
-            if not clickedOnEnemy then
-                local tileX = math.floor(x / tileSize)
-                local tileY = math.floor(y / tileSize)
-                if grid:isDiscovered(tileX, tileY) then
-                    contextMenu:showMove(x, y, tileX, tileY)
-                else
-                    print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
-                end
-            end
+    if state.mode == "game" and button == 2 and not clickedOnEnemy then
+        local tileX = math.floor(x / tileSize)
+        local tileY = math.floor(y / tileSize)
+        if grid:isDiscovered(tileX, tileY) then
+            contextMenu:showMove(x, y, tileX, tileY)
+        else
+            print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
         end
     end
 end
