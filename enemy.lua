@@ -14,15 +14,14 @@ function Enemy:new(x, y, tileSize, speed)
         targetY = y,
         currentX = x * tileSize,
         currentY = y * tileSize,
-        bounceProgress = 1
+        bounceProgress = 1,
+        movedThisTurn = false -- New flag for turn-based movement
     }, self)
 end
 
--- enemy.lua
-function Enemy:update(dt, grid, character)
-    -- Only move if the player has moved and if not currently animating.
-    if character.hasMoved and self.bounceProgress >= 1 then
-        print("Enemy moving!")
+-- This function triggers a new move if the enemy is idle and hasn't moved yet this turn.
+function Enemy:triggerMove(grid)
+    if self.bounceProgress >= 1 and not self.movedThisTurn then
         local dx, dy = 0, 0
         local direction = math.random(4)
         if direction == 1 then
@@ -42,10 +41,13 @@ function Enemy:update(dt, grid, character)
             self.targetX = newX
             self.targetY = newY
             self.bounceProgress = 0
+            self.movedThisTurn = true -- Mark that this enemy has moved this turn
         end
     end
+end
 
-    -- Update bounce interpolation
+function Enemy:update(dt, grid, character)
+    -- Update the bounce interpolation every frame.
     if self.bounceProgress < 1 then
         self.bounceProgress = math.min(self.bounceProgress + dt * self.speed, 1)
         local t = self.bounceProgress
@@ -53,24 +55,26 @@ function Enemy:update(dt, grid, character)
         self.currentX = self.x * self.tileSize + (self.targetX - self.x) * self.tileSize * easedT
         self.currentY = self.y * self.tileSize + (self.targetY - self.y) * self.tileSize * easedT
     else
-        -- Once the bounce completes, update the enemy's logical position.
+        -- Once the bounce (movement) completes, update the enemy's logical position.
         self.x = self.targetX
         self.y = self.targetY
         self.currentX = self.x * self.tileSize
         self.currentY = self.y * self.tileSize
-        print("Enemy reached target:", self.currentX, self.currentY)
+
+        -- Reset the flag so the enemy is ready to move on the next turn.
+        if self.movedThisTurn then
+            self.movedThisTurn = false
+        end
 
         -- Check for collision with the character here.
         if self:checkCollision(character) then
             character.state:decrement("health")
             print("Character damaged by enemy! Health: " .. character.state.health)
-            -- Optionally, add a flag here so that damage occurs only once per move.
         end
     end
 end
 
 function Enemy:draw()
-    -- Draw the enemy as a red triangle
     love.graphics.setColor(1, 0, 0) -- Red color for enemies
     local triangleVertices = Utils.getTriangleVertices(self.currentX, self.currentY, self.tileSize, 0.6)
     love.graphics.polygon("fill", triangleVertices)
