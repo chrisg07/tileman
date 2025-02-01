@@ -48,7 +48,7 @@ function Character:move(dx, dy)
         self.bounceProgress = 0
 
         self.hasMoved = true
-        print("Player moved! hasMoved = true")
+        print("Player moved!")
     end
 end
 

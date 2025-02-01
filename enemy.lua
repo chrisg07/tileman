@@ -18,13 +18,12 @@ function Enemy:new(x, y, tileSize, speed)
     }, self)
 end
 
+-- enemy.lua
 function Enemy:update(dt, grid, character)
-    -- Only move if the player has moved
+    -- Only move if the player has moved and if not currently animating.
     if character.hasMoved and self.bounceProgress >= 1 then
         print("Enemy moving!")
         local dx, dy = 0, 0
-
-        -- Random movement (for now)
         local direction = math.random(4)
         if direction == 1 then
             dx = -1
@@ -36,7 +35,6 @@ function Enemy:update(dt, grid, character)
             dy = 1
         end
 
-        -- Check if the new position is valid
         local newX = math.max(0, math.min(grid.width - 1, self.targetX + dx))
         local newY = math.max(0, math.min(grid.height - 1, self.targetY + dy))
 
@@ -47,7 +45,7 @@ function Enemy:update(dt, grid, character)
         end
     end
 
-    -- Update position with bounce animation
+    -- Update bounce interpolation
     if self.bounceProgress < 1 then
         self.bounceProgress = math.min(self.bounceProgress + dt * self.speed, 1)
         local t = self.bounceProgress
@@ -55,11 +53,19 @@ function Enemy:update(dt, grid, character)
         self.currentX = self.x * self.tileSize + (self.targetX - self.x) * self.tileSize * easedT
         self.currentY = self.y * self.tileSize + (self.targetY - self.y) * self.tileSize * easedT
     else
+        -- Once the bounce completes, update the enemy's logical position.
         self.x = self.targetX
         self.y = self.targetY
         self.currentX = self.x * self.tileSize
         self.currentY = self.y * self.tileSize
         print("Enemy reached target:", self.currentX, self.currentY)
+
+        -- Check for collision with the character here.
+        if self:checkCollision(character) then
+            character.state:decrement("health")
+            print("Character damaged by enemy! Health: " .. character.state.health)
+            -- Optionally, add a flag here so that damage occurs only once per move.
+        end
     end
 end
 
