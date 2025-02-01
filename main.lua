@@ -7,7 +7,9 @@ local overshoot = 1.1
 -- context menu
 local contextMenuVisible = false
 local contextMenuX, contextMenuY = 0, 0
-local targetedEnemy = nil
+local contextMenuType = nil                   -- "attack" or "move"
+local targetedEnemy = nil                     -- if attacking
+local targetedTileX, targetedTileY = nil, nil -- if moving
 
 -- imports
 local suit = require "suit"
@@ -104,15 +106,22 @@ function love.update(dt)
         menu:update(dt)
     end
 
-    -- If the context menu is visible, update its UI using SUIT.
     if contextMenuVisible then
         suit.layout:reset(contextMenuX, contextMenuY)
-        if suit.Button("Attack", suit.layout:row(100, 30)).hit then
-            character:attack(targetedEnemy)
-            contextMenuVisible = false -- Hide the context menu after the action
+        if contextMenuType == "attack" then
+            if suit.Button("Attack", suit.layout:row(100, 30)).hit then
+                character:attack(targetedEnemy)
+                contextMenuVisible = false -- Hide after action
+            end
+        elseif contextMenuType == "move" then
+            if suit.Button("Move Here", suit.layout:row(100, 30)).hit then
+                -- Calculate relative movement (dx,dy) from the current tile:
+                local dx = targetedTileX - character.targetX
+                local dy = targetedTileY - character.targetY
+                character:move(dx, dy)
+                contextMenuVisible = false -- Hide after action
+            end
         end
-
-        -- Optionally, you might add a Cancel button or hide the menu if the user clicks elsewhere.
     end
 end
 
@@ -135,16 +144,39 @@ end
 function love.mousepressed(x, y, button)
     if state.mode == "game" then
         if button == 2 then -- Right-click
+            local clickedOnEnemy = false
+
+            -- First, check if the click is over any enemy.
             for _, enemy in ipairs(enemies) do
                 local ex, ey = enemy.currentX, enemy.currentY
                 if x >= ex and x <= ex + tileSize and y >= ey and y <= ey + tileSize then
                     contextMenuVisible = true
                     contextMenuX, contextMenuY = x, y
                     targetedEnemy = enemy
-                    return
+                    contextMenuType = "attack"
+                    clickedOnEnemy = true
+                    break
                 end
             end
-            contextMenuVisible = false
+
+            -- If not on an enemy, check if the click is on a discovered tile.
+            if not clickedOnEnemy then
+                local tileX = math.floor(x / tileSize)
+                local tileY = math.floor(y / tileSize)
+                if grid:isDiscovered(tileX, tileY) then
+                    -- Only allow movement if the tile is adjacent to the character's current target.
+                    local currentTileX = character.targetX
+                    local currentTileY = character.targetY
+                    if math.abs(tileX - currentTileX) + math.abs(tileY - currentTileY) == 1 then
+                        contextMenuVisible = true
+                        contextMenuX, contextMenuY = x, y
+                        targetedTileX, targetedTileY = tileX, tileY
+                        contextMenuType = "move"
+                    else
+                        print("Selected tile is not adjacent!")
+                    end
+                end
+            end
         end
     end
 end
