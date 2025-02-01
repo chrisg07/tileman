@@ -1,4 +1,4 @@
--- pathfinding.lua
+-- pathfinding.lua a.k.a DeepSeek go brrrr
 local Pathfinding = {}
 
 -- Heuristic: Manhattan distance.
