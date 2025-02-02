@@ -7,7 +7,8 @@ function State:new()
         mode = "menu",
         tiles = 0,
         energy = 0,
-        health = 1
+        health = 1,
+        experience = 0
     }, self)
 end
 

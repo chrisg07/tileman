@@ -54,12 +54,38 @@ function love.update(dt)
     contextMenu:update(dt, world.character, world.grid, state)
 end
 
+local function drawProgressBar(x, y, width, height, progress)
+    -- Draw the background (bar outline)
+    love.graphics.setColor(0.3, 0.3, 0.3) -- dark gray background
+    love.graphics.rectangle("fill", x, y, width, height)
+
+    -- Draw the progress (filled portion)
+    love.graphics.setColor(0.1, 0.8, 0.1) -- green fill
+    love.graphics.rectangle("fill", x, y, width * progress, height)
+
+    -- Draw the border
+    love.graphics.setColor(1, 1, 1) -- white border
+    love.graphics.rectangle("line", x, y, width, height)
+
+    -- Reset the color (if needed)
+    love.graphics.setColor(1, 1, 1)
+
+    -- Optionally, you can also draw text showing the percentage or raw numbers:
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(string.format("EXP: %d / %d", state.experience, 100), x, y + height + 5)
+end
+
 function love.draw()
     background:draw()
     world:draw()
     menu:draw()
     contextMenu:draw()
     suit.draw()
+
+    -- Draw the experience progress bar.
+    -- For example, draw it at (50, 50) with a width of 200 and height of 20:
+    local progress = state.experience / 100
+    drawProgressBar(400, 25, 200, 20, progress)
 end
 
 function love.mousepressed(x, y, button)
