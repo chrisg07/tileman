@@ -30,22 +30,26 @@ function Skills:get(skillName)
 end
 
 -- Local helper function to draw a single progress bar.
-local function drawProgressBar(x, y, width, height, progress)
-    -- Draw the background.
-    love.graphics.setColor(0.3, 0.3, 0.3) -- dark gray
-    love.graphics.rectangle("fill", x, y, width, height)
+local function drawProgressBar(x, y, width, height, progress, scale)
+    scale = scale or 1
+    -- Adjust x, y to center the scaled rectangle.
+    local scaledWidth = width * scale
+    local scaledHeight = height * scale
+    local offsetX = (scaledWidth - width) / 2
+    local offsetY = (scaledHeight - height) / 2
 
-    -- Draw the progress (filled portion).
-    love.graphics.setColor(0.1, 0.8, 0.1) -- green
-    love.graphics.rectangle("fill", x, y, width * progress, height)
+    love.graphics.setColor(0.3, 0.3, 0.3) -- background
+    love.graphics.rectangle("fill", x - offsetX, y - offsetY, scaledWidth, scaledHeight)
 
-    -- Draw the border.
-    love.graphics.setColor(1, 1, 1) -- white
-    love.graphics.rectangle("line", x, y, width, height)
+    love.graphics.setColor(0.1, 0.8, 0.1) -- fill
+    love.graphics.rectangle("fill", x - offsetX, y - offsetY, scaledWidth * progress, scaledHeight)
 
-    -- Reset color.
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(1, 1, 1) -- border
+    love.graphics.rectangle("line", x - offsetX, y - offsetY, scaledWidth, scaledHeight)
+
+    love.graphics.setColor(1, 1, 1) -- reset color
 end
+
 
 -- Draw all the progress bars for the skills.
 -- Parameters:
@@ -58,7 +62,7 @@ function Skills:drawProgressBars(x, y, width, height, spacing)
         local posX = x
         local posY = y + i * (height + spacing)
         local progress = skill:getProgress()
-        drawProgressBar(posX, posY, width, height, progress)
+        drawProgressBar(posX, posY, width, height, progress, skill.scale)
         love.graphics.print(skill.name .. " Lvl " .. skill.level, posX, posY + height + 5)
         i = i + 1
     end

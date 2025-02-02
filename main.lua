@@ -5,6 +5,7 @@ local overshoot = 1.1
 
 -- Imports
 local suit = require "suit"
+local flux = require "flux.flux"
 local Menu = require("menu")
 local State = require("state")
 local Background = require("background")
@@ -52,6 +53,8 @@ function love.update(dt)
     world:update(dt, bounceDuration, overshoot)
     menu:update(dt)
     contextMenu:update(dt, world.character, world.grid, state)
+
+    flux.update(dt)
 end
 
 function love.draw()

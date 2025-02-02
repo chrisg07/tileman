@@ -6,6 +6,8 @@ To run the game on MacOS after installing Love: `open -n -a love "../tileman"`
 
 [SUIT](https://github.com/vrld/suit) is used for UI elements
 
+TODO: Look into tweening and how it can be used for some simple but effective animations
+
 ## Inspiration
 
 - Balatro for language/framework
