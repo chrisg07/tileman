@@ -110,7 +110,7 @@ function Character:chopTree(tileX, tileY)
     local key = tileX .. "," .. tileY
     if self.grid.tiles[key] and self.grid.tiles[key].type == "tree" then
         -- Do any additional chopping logic (e.g., add wood to inventory)
-        self.state.experience = self.state.experience + 5
+        self.state.skills:addXP("woodcutting", 5)
         self.grid:chopTree(tileX, tileY)
         return true
     end
