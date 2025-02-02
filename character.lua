@@ -107,8 +107,13 @@ function Character:draw(tileSize)
 end
 
 function Character:chopTree(tileX, tileY)
-    self.grid:setTile(tileX, tileY, "stump")
-    print("Tree chopped!")
+    local key = tileX .. "," .. tileY
+    if self.grid.tiles[key] and self.grid.tiles[key].type == "tree" then
+        -- Do any additional chopping logic (e.g., add wood to inventory)
+        self.grid:chopTree(tileX, tileY)
+        return true
+    end
+    return false
 end
 
 function Character:attack(enemy)

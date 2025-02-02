@@ -31,6 +31,8 @@ function World:update(dt, bounceDuration, overshoot)
     for _, enemy in ipairs(self.enemies) do
         enemy:update(dt, self.grid, self.character)
     end
+
+    self.grid:update(dt)
 end
 
 function World:draw()
