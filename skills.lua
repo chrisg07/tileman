@@ -29,26 +29,25 @@ function Skills:get(skillName)
     return self.skills[skillName]
 end
 
--- Local helper function to draw a single progress bar.
 local function drawProgressBar(x, y, width, height, progress, scale)
     scale = scale or 1
-    -- Adjust x, y to center the scaled rectangle.
     local scaledWidth = width * scale
     local scaledHeight = height * scale
     local offsetX = (scaledWidth - width) / 2
     local offsetY = (scaledHeight - height) / 2
 
-    love.graphics.setColor(0.3, 0.3, 0.3) -- background
+    love.graphics.setColor(0.3, 0.3, 0.3)
     love.graphics.rectangle("fill", x - offsetX, y - offsetY, scaledWidth, scaledHeight)
 
-    love.graphics.setColor(0.1, 0.8, 0.1) -- fill
+    love.graphics.setColor(0.1, 0.8, 0.1)
     love.graphics.rectangle("fill", x - offsetX, y - offsetY, scaledWidth * progress, scaledHeight)
 
-    love.graphics.setColor(1, 1, 1) -- border
+    love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("line", x - offsetX, y - offsetY, scaledWidth, scaledHeight)
 
-    love.graphics.setColor(1, 1, 1) -- reset color
+    love.graphics.setColor(1, 1, 1)
 end
+
 
 
 -- Draw all the progress bars for the skills.
