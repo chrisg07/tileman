@@ -51,14 +51,14 @@ function Grid:discoverTile(x, y)
         local tileType, tileWeight = getRandomTileType()
         self.tiles[key] = { type = tileType, discovered = true, weight = tileWeight }
         local gain = math.floor(constant / tileWeight)
-        self.state.experience = (self.state.experience or 0) + gain
+        self.state.skills:addXP("exploration", gain)
         print("Discovered new tile (" .. x .. ", " .. y .. "): " .. tileType .. " gained " .. gain .. " exp")
     elseif self.tiles[key] and not self.tiles[key].discovered then
         -- The tile was pre-generated as undiscovered. Now mark it discovered.
         self.tiles[key].discovered = true
         local tileWeight = self.tiles[key].weight or 50 -- default weight if missing
         local gain = math.floor(constant / tileWeight)
-        self.state.experience = (self.state.experience or 0) + gain
+        self.state.skills:addXP("exploration", gain)
         print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 

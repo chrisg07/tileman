@@ -1,4 +1,5 @@
 -- state.lua
+local Skills = require "skills"
 local State = {}
 State.__index = State
 
@@ -8,7 +9,8 @@ function State:new()
         tiles = 0,
         energy = 0,
         health = 1,
-        experience = 0
+        experience = 0,
+        skills = Skills:new(),
     }, self)
 end
 
