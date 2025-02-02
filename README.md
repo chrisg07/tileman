@@ -49,8 +49,15 @@ Rarer resources the lower you go.
 - Increase backpack size
 - Increase max number of items retained on death
 - Max energy
+- Reduce respawn time for trees
 - Fog of war radius
 - Enemies
     - Increase max enemy health
 - Shovel: Allows the character to dig to a lower floor if they reach their lowest floor
 - Boat: Ability to travel over water
+
+## Skills
+
+- Total level
+- Exploration: Gain experience when discovering tiles inversely related to their probability of being discovered
+- Woodcutting: Gain experience when chopping trees

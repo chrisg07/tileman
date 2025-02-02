@@ -8,22 +8,6 @@ local tileTypes = {
     { type = "tree",  weight = 5 }
 }
 
-function Grid:new(tileSize)
-    local screenWidth, screenHeight = love.graphics.getDimensions()
-    local gridWidth = math.floor(screenWidth / tileSize)
-    local gridHeight = math.floor(screenHeight / tileSize)
-
-    local self = setmetatable({
-        width = gridWidth,
-        height = gridHeight,
-        tileSize = tileSize,
-        tiles = {},
-        growthQueue = {}
-    }, Grid)
-
-    return self
-end
-
 local function getRandomTileType()
     local totalWeight = 0
     for _, tile in ipairs(tileTypes) do
@@ -41,11 +25,55 @@ local function getRandomTileType()
     end
 end
 
+function Grid:new(tileSize)
+    local screenWidth, screenHeight = love.graphics.getDimensions()
+    local gridWidth = math.floor(screenWidth / tileSize)
+    local gridHeight = math.floor(screenHeight / tileSize)
+
+    local self = setmetatable({
+        width = gridWidth,
+        height = gridHeight,
+        tileSize = tileSize,
+        tiles = {},
+        growthQueue = {}
+    }, Grid)
+
+    return self
+end
+
+-- When a tile is discovered, generate it (if needed) and mark it discovered.
+-- Also, for each adjacent tile that is not in the grid yet, create a preview tile.
 function Grid:discoverTile(x, y)
     local key = x .. "," .. y
     if not self.tiles[key] then
         local tileType = getRandomTileType()
         self.tiles[key] = { type = tileType, discovered = true }
+    else
+        self.tiles[key].discovered = true
+        -- (Optional) In case the tile existed only as a preview, ensure its type is set.
+        if not self.tiles[key].type then
+            self.tiles[key].type = getRandomTileType()
+        end
+    end
+
+    -- Pre-generate neighbors (if not already present) as undiscovered tiles.
+    local offsets = {
+        { 1, 0 }, { -1, 0 },
+        { 0, 1 }, { 0, -1 },
+        { 1,  1 }, { 1, -1 },
+        { -1, 1 }, { -1, -1 }
+    }
+    for _, offset in ipairs(offsets) do
+        local nx = x + offset[1]
+        local ny = y + offset[2]
+        -- Check bounds
+        if nx >= 0 and nx < self.width and ny >= 0 and ny < self.height then
+            local nkey = nx .. "," .. ny
+            if not self.tiles[nkey] then
+                -- Create a preview tile that is not yet discovered.
+                self.tiles[nkey] = { type = getRandomTileType(), discovered = false }
+            end
+        end
     end
 end
 
@@ -55,19 +83,43 @@ function Grid:setTile(x, y, type)
 end
 
 function Grid:isDiscovered(x, y)
-    return self.tiles[x .. "," .. y] ~= nil
+    local key = x .. "," .. y
+    return self.tiles[key] and self.tiles[key].discovered
 end
 
+-- Draw every tile in the grid.
+-- Discovered tiles are drawn normally.
+-- Undiscovered tiles (but pre-generated) are drawn foggy with their type shown in a faded way.
 function Grid:draw()
-    for key, tile in pairs(self.tiles) do
-        local x, y = key:match("([^,]+),([^,]+)")
-        x, y = tonumber(x), tonumber(y)
-        love.graphics.print(tile.type or "?", x * self.tileSize, y * self.tileSize)
+    local ts = self.tileSize
+    for y = 0, self.height - 1 do
+        for x = 0, self.width - 1 do
+            local key = x .. "," .. y
+            local posX, posY = x * ts, y * ts
+            local tile = self.tiles[key]
+            if tile then
+                if tile.discovered then
+                    -- Fully discovered: draw normally.
+                    love.graphics.setColor(1, 1, 1)
+                    love.graphics.print(tile.type or "?", posX, posY)
+                else
+                    -- Not discovered: draw a foggy preview.
+                    love.graphics.setColor(0.5, 0.5, 0.5, 0.5) -- semi-transparent gray
+                    love.graphics.rectangle("fill", posX, posY, ts, ts)
+                    love.graphics.setColor(1, 1, 1)
+                    love.graphics.print(tile.type or "?", posX + ts * 0.25, posY + ts * 0.25)
+                end
+            else
+                -- If a tile hasn't been generated yet, you could fill it with black.
+                love.graphics.setColor(0, 0, 0)
+                love.graphics.rectangle("fill", posX, posY, ts, ts)
+                love.graphics.setColor(1, 1, 1)
+            end
+        end
     end
 end
 
--- Call this function to chop a tree at tile (x, y).
--- growDelay is in seconds (default is 10 seconds).
+-- Existing chopping and growth functions remain unchanged.
 function Grid:chopTree(x, y)
     local key = x .. "," .. y
     if self.tiles[key] and self.tiles[key].type == "tree" then
