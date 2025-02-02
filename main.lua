@@ -73,20 +73,10 @@ function love.draw()
     contextMenu:draw()
     suit.draw()
 
-    -- Draw the experience progress bar.
-    -- For example, draw it at (50, 50) with a width of 200 and height of 20:
-    -- local miningSkill = state.skills:get("mining")
-    -- if miningSkill then
-    --     local progress = miningSkill:getProgress()
-    --     drawProgressBar(400, 50, 200, 20, progress)
-    --     love.graphics.print("Mining Lvl " .. miningSkill.level, 400, 75)
-    -- end
-    local explorationSkill = state.skills:get("exploration")
-    if explorationSkill then
-        local progress = explorationSkill:getProgress()
-        drawProgressBar(400, 50, 200, 20, progress)
-        love.graphics.print("Exploration Lvl " .. explorationSkill.level, 400, 75)
-    end
+    -- Draw all skill progress bars starting at (400, 50),
+    -- with each bar 200px wide, 20px tall, and 20px vertical spacing.
+    local skillBarVerticalSpacing = 25
+    state.skills:drawProgressBars(400, 50, 200, 20, skillBarVerticalSpacing)
 end
 
 function love.mousepressed(x, y, button)
