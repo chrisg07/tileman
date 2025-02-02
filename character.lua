@@ -1,12 +1,12 @@
 -- character.lua
 local Utils = require("utils")
+local flux = require("flux.flux") -- Adjust the require path as needed
 
 local Character = {}
 Character.__index = Character
 
 function Character:new(x, y, tileSize, state, grid)
     grid:discoverTile(x, y)
-
     return setmetatable({
         targetX = x,
         targetY = y,
@@ -14,31 +14,44 @@ function Character:new(x, y, tileSize, state, grid)
         startY = y * tileSize,
         currentX = x * tileSize,
         currentY = y * tileSize,
-        bounceProgress = 1,
         state = state,
         grid = grid,
         hasMoved = false,
         path = nil,      -- Holds the current path (if any)
         pathIndex = nil, -- Index of the next node in the path
+        moveTween = nil, -- Reference to the current tween (if any)
     }, self)
 end
 
+-- When a multi-tile path is set (for example via the context menu), we assume that
+-- the first node is the current position, so we start at index 2.
 function Character:setPath(path)
     self.path = path
-    -- Assuming the first node in the path is the current position,
-    -- start from the second node.
-    self.pathIndex = 2
+    if #path > 1 then
+        -- Start at the second node (since the first node is the current position).
+        self.pathIndex = 2
+        if not self.moveTween then
+            local nextTile = self.path[self.pathIndex]
+            local dx = nextTile.x - self.targetX
+            local dy = nextTile.y - self.targetY
+            self.pathIndex = self.pathIndex + 1
+            self:move(dx, dy)
+        end
+    end
 end
 
 function Character:move(dx, dy)
-    if self.state:get("energy") <= 0 then
-        return
-    end
+    -- Check for available energy.
+    if self.state:get("energy") <= 0 then return end
 
-    if self.bounceProgress >= 1 and self.grid then
+    -- If a tween is already in progress, do not start a new one.
+    if self.moveTween then return end
+
+    if self.grid then
         local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
         local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
 
+        -- Discovery and energy logic.
         if not self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
             self.grid:discoverTile(newX, newY)
             self.state:decrement("tiles")
@@ -49,53 +62,46 @@ function Character:move(dx, dy)
             return
         end
 
-        -- Maintain animation logic
+        -- Set the new target position and record the starting position.
         self.targetX = newX
         self.targetY = newY
         self.startX = self.currentX
         self.startY = self.currentY
-        self.bounceProgress = 0
 
-        self.hasMoved = true
-        print("Player moved!")
+        local ts = self.grid.tileSize
+        local targetPixelX = newX * ts
+        local targetPixelY = newY * ts
+
+        -- Start tweening from the current position to the new target pixel position.
+        self.moveTween = flux.to(self, 0.3, { currentX = targetPixelX, currentY = targetPixelY })
+            :ease("quadout")
+            :oncomplete(function()
+                self.moveTween = nil -- Clear the tween reference.
+                -- Snap the character exactly to the target position.
+                self.currentX = targetPixelX
+                self.currentY = targetPixelY
+                print("Player moved to (" .. newX .. ", " .. newY .. ")")
+                -- If a multi-tile path is set, chain the next move.
+                if self.path and self.pathIndex and self.pathIndex <= #self.path then
+                    local nextTile = self.path[self.pathIndex]
+                    local nextDX = nextTile.x - self.targetX
+                    local nextDY = nextTile.y - self.targetY
+                    self.pathIndex = self.pathIndex + 1
+                    self:move(nextDX, nextDY)
+                elseif self.pathIndex and self.pathIndex > #self.path then
+                    -- Path complete.
+                    self.path = nil
+                    self.pathIndex = nil
+                    print("Path complete")
+                end
+            end)
     end
 end
 
-function Character:update(dt, tileSize, bounceDuration, overshoot)
-    -- If a path is set and the character is not mid-move, trigger the next step.
-    if self.path and self.pathIndex then
-        if self.bounceProgress >= 1 and self.pathIndex <= #self.path then
-            local nextTile = self.path[self.pathIndex]
-            local dx = nextTile.x - self.targetX
-            local dy = nextTile.y - self.targetY
-            self:move(dx, dy)
-            self.pathIndex = self.pathIndex + 1
-        end
-        if self.pathIndex and self.pathIndex > #self.path then
-            -- Path complete.
-            self.path = nil
-            self.pathIndex = nil
-        end
-    end
-
-    -- Existing animation logic.
-    if self.bounceProgress < 1 then
-        self.bounceProgress = math.min(self.bounceProgress + dt / bounceDuration, 1)
-        local t = self.bounceProgress
-        local easedT = t < 0.5 and 2 * t * t or -1 + (4 - 2 * t) * t
-        local dx = (self.targetX * tileSize - self.startX)
-        local dy = (self.targetY * tileSize - self.startY)
-        local distance = math.sqrt(dx ^ 2 + dy ^ 2)
-        local overshootFactor = overshoot * (1 - t)
-        local overshootX = 0
-        local overshootY = 0
-        if distance > 0 then
-            overshootX = dx / distance * overshootFactor * tileSize
-            overshootY = dy / distance * overshootFactor * tileSize
-        end
-        self.currentX = self.startX + dx * easedT + overshootX
-        self.currentY = self.startY + dy * easedT + overshootY
-    else
+-- Update method now only ensures that if no tween is active, the character's position
+-- is exactly at its target. Flux handles the tween interpolation.
+function Character:update(dt, tileSize)
+    if not self.moveTween then
         self.currentX = self.targetX * tileSize
         self.currentY = self.targetY * tileSize
     end
@@ -109,7 +115,6 @@ end
 function Character:chopTree(tileX, tileY)
     local key = tileX .. "," .. tileY
     if self.grid.tiles[key] and self.grid.tiles[key].type == "tree" then
-        -- Do any additional chopping logic (e.g., add wood to inventory)
         self.state.skills:addXP("woodcutting", 5)
         self.grid:chopTree(tileX, tileY)
         return true
@@ -118,10 +123,8 @@ function Character:chopTree(tileX, tileY)
 end
 
 function Character:attack(enemy)
-    -- Example attack logic:
     print("Attacking enemy at (" .. enemy.x .. ", " .. enemy.y .. ")")
-    -- Here you might reduce the enemy's health or remove the enemy from the enemies table.
-    -- You could also trigger an animation or change game state to a combat phase.
+    -- Attack logic would go here.
 end
 
 return Character
