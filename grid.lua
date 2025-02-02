@@ -20,12 +20,12 @@ local function getRandomTileType()
     for _, tile in ipairs(tileTypes) do
         cumulativeWeight = cumulativeWeight + tile.weight
         if randomValue <= cumulativeWeight then
-            return tile.type
+            return tile.type, tile.weight
         end
     end
 end
 
-function Grid:new(tileSize)
+function Grid:new(tileSize, state)
     local screenWidth, screenHeight = love.graphics.getDimensions()
     local gridWidth = math.floor(screenWidth / tileSize)
     local gridHeight = math.floor(screenHeight / tileSize)
@@ -34,6 +34,7 @@ function Grid:new(tileSize)
         width = gridWidth,
         height = gridHeight,
         tileSize = tileSize,
+        state = state,
         tiles = {},
         growthQueue = {}
     }, Grid)
@@ -41,22 +42,27 @@ function Grid:new(tileSize)
     return self
 end
 
--- When a tile is discovered, generate it (if needed) and mark it discovered.
--- Also, for each adjacent tile that is not in the grid yet, create a preview tile.
 function Grid:discoverTile(x, y)
     local key = x .. "," .. y
+    local constant = 50 -- You can adjust this to balance experience rewards
+
     if not self.tiles[key] then
-        local tileType = getRandomTileType()
-        self.tiles[key] = { type = tileType, discovered = true }
-    else
+        -- Tile does not exist at all: generate it and mark discovered.
+        local tileType, tileWeight = getRandomTileType()
+        self.tiles[key] = { type = tileType, discovered = true, weight = tileWeight }
+        local gain = math.floor(constant / tileWeight)
+        self.state.experience = (self.state.experience or 0) + gain
+        print("Discovered new tile (" .. x .. ", " .. y .. "): " .. tileType .. " gained " .. gain .. " exp")
+    elseif self.tiles[key] and not self.tiles[key].discovered then
+        -- The tile was pre-generated as undiscovered. Now mark it discovered.
         self.tiles[key].discovered = true
-        -- (Optional) In case the tile existed only as a preview, ensure its type is set.
-        if not self.tiles[key].type then
-            self.tiles[key].type = getRandomTileType()
-        end
+        local tileWeight = self.tiles[key].weight or 50 -- default weight if missing
+        local gain = math.floor(constant / tileWeight)
+        self.state.experience = (self.state.experience or 0) + gain
+        print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 
-    -- Pre-generate neighbors (if not already present) as undiscovered tiles.
+    -- Pre-generate neighbors as undiscovered tiles.
     local offsets = {
         { 1, 0 }, { -1, 0 },
         { 0, 1 }, { 0, -1 },
@@ -66,12 +72,11 @@ function Grid:discoverTile(x, y)
     for _, offset in ipairs(offsets) do
         local nx = x + offset[1]
         local ny = y + offset[2]
-        -- Check bounds
         if nx >= 0 and nx < self.width and ny >= 0 and ny < self.height then
             local nkey = nx .. "," .. ny
             if not self.tiles[nkey] then
-                -- Create a preview tile that is not yet discovered.
-                self.tiles[nkey] = { type = getRandomTileType(), discovered = false }
+                local tType, tWeight = getRandomTileType()
+                self.tiles[nkey] = { type = tType, discovered = false, weight = tWeight }
             end
         end
     end
