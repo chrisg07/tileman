@@ -61,7 +61,7 @@ function Grid:discoverTile(x, y)
         }
 
         -- Animate tile upwards
-        flux.to(self.tiles[key], 0.5, { yOffset = 0 }):ease("quadout")
+        flux.to(self.tiles[key], 2, { yOffset = 0 }):ease("elasticinout")
 
         -- XP gain for exploration
         local gain = math.floor(constant / tileWeight)
@@ -91,7 +91,7 @@ function Grid:discoverTile(x, y)
             }
 
             -- Animate seen tile upwards
-            flux.to(self.tiles[nkey], 0.5, { yOffset = 0 }):ease("quadout")
+            flux.to(self.tiles[nkey], 2, { yOffset = 0 }):ease("elasticinout")
         end
     end
 end
