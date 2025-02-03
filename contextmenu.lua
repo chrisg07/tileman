@@ -23,23 +23,32 @@ end
 --   enemies: the list of enemies
 --   character: the player character (to perform actions)
 --   state: the game state (for checking mode, energy, etc.)
-function ContextMenu:open(x, y, grid, enemies, character, state)
-    local tileX = math.floor(x / self.tileSize)
-    local tileY = math.floor(y / self.tileSize)
+function ContextMenu:open(x, y, grid, enemies, character, state, camera)
+    -- Adjust for camera position to get world coordinates
+    local adjustedX = x + camera.x
+    local adjustedY = y + camera.y
 
-    if not grid:isDiscovered(tileX, tileY) then
-        print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered!")
+    -- Convert world coordinates to tile coordinates
+    local tileX = math.floor(adjustedX / self.tileSize)
+    local tileY = math.floor(adjustedY / self.tileSize)
+
+    -- Get tile key
+    local tileKey = tileX .. "," .. tileY
+    local tile = grid.tiles[tileKey]
+
+    -- Only allow context menu on discovered or seen tiles
+    if not tile or not tile.discovered then
+        print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered or seen!")
         return
     end
 
-    self.x = x
+    self.x = x -- Keep menu at screen position (not world position)
     self.y = y
     self.actions = {} -- Clear previous actions
 
     -- Check if an enemy occupies the clicked tile.
     local foundEnemy = nil
     for _, enemy in ipairs(enemies) do
-        -- Assume enemy.x and enemy.y store the enemy's tile coordinates.
         if enemy.x == tileX and enemy.y == tileY then
             foundEnemy = enemy
             break
@@ -57,8 +66,6 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
     end
 
     -- Check if the tile is a tree.
-    local tileKey = tileX .. "," .. tileY
-    local tile = grid.tiles[tileKey]
     if tile and tile.type == "tree" then
         table.insert(self.actions, {
             label = "Chop Tree",
@@ -92,11 +99,13 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
     self.visible = true
 end
 
+
+
 -- This method can be called from love.mousepressed to let the context menu handle the right-click.
 -- Pass in all necessary dependencies.
-function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
+function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state, camera)
     if button == 2 then -- Right-click in game mode
-        self:open(x, y, grid, enemies, character, state)
+        self:open(x, y, grid, enemies, character, state, camera)
     end
 end
 

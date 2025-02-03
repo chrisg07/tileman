@@ -44,43 +44,34 @@ end
 
 function Grid:discoverTile(x, y)
     local key = x .. "," .. y
-    local constant = 50 -- You can adjust this to balance experience rewards
+    local constant = 50 -- XP reward scaling factor
 
     if not self.tiles[key] then
-        -- Tile does not exist at all: generate it and mark discovered.
         local tileType, tileWeight = getRandomTileType()
         self.tiles[key] = { type = tileType, discovered = true, weight = tileWeight }
         local gain = math.floor(constant / tileWeight)
         self.state.skills:addXP("exploration", gain)
         print("Discovered new tile (" .. x .. ", " .. y .. "): " .. tileType .. " gained " .. gain .. " exp")
-    elseif self.tiles[key] and not self.tiles[key].discovered then
-        -- The tile was pre-generated as undiscovered. Now mark it discovered.
+    elseif not self.tiles[key].discovered then
         self.tiles[key].discovered = true
-        local tileWeight = self.tiles[key].weight or 50 -- default weight if missing
+        local tileWeight = self.tiles[key].weight or 50
         local gain = math.floor(constant / tileWeight)
         self.state.skills:addXP("exploration", gain)
         print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 
-    -- Pre-generate neighbors as undiscovered tiles.
-    local offsets = {
-        { 1, 0 }, { -1, 0 },
-        { 0, 1 }, { 0, -1 },
-        { 1,  1 }, { 1, -1 },
-        { -1, 1 }, { -1, -1 }
-    }
+    -- Always generate new surrounding tiles
+    local offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} }
     for _, offset in ipairs(offsets) do
-        local nx = x + offset[1]
-        local ny = y + offset[2]
-        if nx >= 0 and nx < self.width and ny >= 0 and ny < self.height then
-            local nkey = nx .. "," .. ny
-            if not self.tiles[nkey] then
-                local tType, tWeight = getRandomTileType()
-                self.tiles[nkey] = { type = tType, discovered = false, weight = tWeight }
-            end
+        local nx, ny = x + offset[1], y + offset[2]
+        local nkey = nx .. "," .. ny
+        if not self.tiles[nkey] then
+            local tType, tWeight = getRandomTileType()
+            self.tiles[nkey] = { type = tType, discovered = false, weight = tWeight }
         end
     end
 end
+
 
 function Grid:setTile(x, y, type)
     local key = x .. "," .. y
@@ -97,32 +88,25 @@ end
 -- Undiscovered tiles (but pre-generated) are drawn foggy with their type shown in a faded way.
 function Grid:draw()
     local ts = self.tileSize
-    for y = 0, self.height - 1 do
-        for x = 0, self.width - 1 do
-            local key = x .. "," .. y
-            local posX, posY = x * ts, y * ts
-            local tile = self.tiles[key]
-            if tile then
-                if tile.discovered then
-                    -- Fully discovered: draw normally.
-                    love.graphics.setColor(1, 1, 1)
-                    love.graphics.print(tile.type or "?", posX, posY)
-                else
-                    -- Not discovered: draw a foggy preview.
-                    love.graphics.setColor(0.5, 0.5, 0.5, 0.5) -- semi-transparent gray
-                    love.graphics.rectangle("fill", posX, posY, ts, ts)
-                    love.graphics.setColor(1, 1, 1)
-                    love.graphics.print(tile.type or "?", posX + ts * 0.25, posY + ts * 0.25)
-                end
-            else
-                -- If a tile hasn't been generated yet, you could fill it with black.
-                -- love.graphics.setColor(0, 0, 0)
-                -- love.graphics.rectangle("fill", posX, posY, ts, ts)
-                -- love.graphics.setColor(1, 1, 1)
-            end
+    for key, tile in pairs(self.tiles) do
+        local x, y = key:match("([^,]+),([^,]+)")
+        x, y = tonumber(x), tonumber(y)
+        local posX, posY = x * ts, y * ts
+
+        if tile.discovered then
+            -- Draw discovered tiles normally.
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print(tile.type or "?", posX, posY)
+        else
+            -- Draw undiscovered tiles with a fog effect.
+            love.graphics.setColor(0.5, 0.5, 0.5, 0.5) -- semi-transparent gray
+            love.graphics.rectangle("fill", posX, posY, ts, ts)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print(tile.type or "?", posX + ts * 0.25, posY + ts * 0.25)
         end
     end
 end
+
 
 -- Existing chopping and growth functions remain unchanged.
 function Grid:chopTree(x, y)

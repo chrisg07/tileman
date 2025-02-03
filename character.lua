@@ -41,62 +41,47 @@ function Character:setPath(path)
 end
 
 function Character:move(dx, dy)
-    -- Check for available energy.
     if self.state:get("energy") <= 0 then return end
-
-    -- If a tween is already in progress, do not start a new one.
     if self.moveTween then return end
 
-    if self.grid then
-        local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
-        local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
+    local newX = self.targetX + dx
+    local newY = self.targetY + dy
 
-        -- Discovery and energy logic.
-        if not self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 and self.state:get("tiles") > 0 then
-            self.grid:discoverTile(newX, newY)
-            self.state:decrement("tiles")
-            self.state:decrement("energy")
-        elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
-            self.state:decrement("energy")
-        else
-            return
-        end
-
-        -- Set the new target position and record the starting position.
-        self.targetX = newX
-        self.targetY = newY
-        self.startX = self.currentX
-        self.startY = self.currentY
-
-        local ts = self.grid.tileSize
-        local targetPixelX = newX * ts
-        local targetPixelY = newY * ts
-
-        -- Start tweening from the current position to the new target pixel position.
-        self.moveTween = flux.to(self, 0.3, { currentX = targetPixelX, currentY = targetPixelY })
-            :ease("quadout")
-            :oncomplete(function()
-                self.moveTween = nil -- Clear the tween reference.
-                -- Snap the character exactly to the target position.
-                self.currentX = targetPixelX
-                self.currentY = targetPixelY
-                print("Player moved to (" .. newX .. ", " .. newY .. ")")
-                -- If a multi-tile path is set, chain the next move.
-                if self.path and self.pathIndex and self.pathIndex <= #self.path then
-                    local nextTile = self.path[self.pathIndex]
-                    local nextDX = nextTile.x - self.targetX
-                    local nextDY = nextTile.y - self.targetY
-                    self.pathIndex = self.pathIndex + 1
-                    self:move(nextDX, nextDY)
-                elseif self.pathIndex and self.pathIndex > #self.path then
-                    -- Path complete.
-                    self.path = nil
-                    self.pathIndex = nil
-                    print("Path complete")
-                end
-            end)
+    -- Ensure that the tile is generated before moving
+    if not self.grid:isDiscovered(newX, newY) then
+        self.grid:discoverTile(newX, newY)
     end
+
+    -- Energy and tile discovery logic
+    if not self.grid:isDiscovered(newX, newY) and self.state:get("tiles") > 0 then
+        self.grid:discoverTile(newX, newY)
+        self.state:decrement("tiles")
+        self.state:decrement("energy")
+    elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
+        self.state:decrement("energy")
+    else
+        return
+    end
+
+    self.targetX = newX
+    self.targetY = newY
+    self.startX = self.currentX
+    self.startY = self.currentY
+
+    local ts = self.grid.tileSize
+    local targetPixelX = newX * ts
+    local targetPixelY = newY * ts
+
+    self.moveTween = flux.to(self, 0.3, { currentX = targetPixelX, currentY = targetPixelY })
+        :ease("quadout")
+        :oncomplete(function()
+            self.moveTween = nil
+            self.currentX = targetPixelX
+            self.currentY = targetPixelY
+            print("Player moved to (" .. newX .. ", " .. newY .. ")")
+        end)
 end
+
 
 -- Update method now only ensures that if no tween is active, the character's position
 -- is exactly at its target. Flux handles the tween interpolation.

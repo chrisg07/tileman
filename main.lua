@@ -88,5 +88,5 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
-    contextMenu:handleMousePress(x, y, button, world.grid, world.enemies, world.character, state)
+    contextMenu:handleMousePress(x, y, button, world.grid, world.enemies, world.character, state, camera)
 end
