@@ -1,6 +1,8 @@
 local Grid = {}
 Grid.__index = Grid
 
+local flux = require("flux.flux") -- Ensure flux is required
+
 local tileTypes = {
     { type = "grass", weight = 50 },
     { type = "sand",  weight = 30 },
@@ -48,7 +50,20 @@ function Grid:discoverTile(x, y)
 
     if not self.tiles[key] then
         local tileType, tileWeight = getRandomTileType()
-        self.tiles[key] = { type = tileType, discovered = true, weight = tileWeight }
+        
+        -- New tile starts below the screen and will animate upwards
+        self.tiles[key] = {
+            type = tileType,
+            discovered = true, -- Mark as discovered
+            seen = true, -- Also mark as seen
+            weight = tileWeight,
+            yOffset = love.graphics.getHeight() -- Start off-screen
+        }
+
+        -- Animate tile upwards
+        flux.to(self.tiles[key], 0.5, { yOffset = 0 }):ease("quadout")
+
+        -- XP gain for exploration
         local gain = math.floor(constant / tileWeight)
         self.state.skills:addXP("exploration", gain)
         print("Discovered new tile (" .. x .. ", " .. y .. "): " .. tileType .. " gained " .. gain .. " exp")
@@ -60,17 +75,28 @@ function Grid:discoverTile(x, y)
         print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 
-    -- Always generate new surrounding tiles
+    -- Generate surrounding tiles but **mark them as seen, not discovered**
     local offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} }
     for _, offset in ipairs(offsets) do
         local nx, ny = x + offset[1], y + offset[2]
         local nkey = nx .. "," .. ny
         if not self.tiles[nkey] then
             local tType, tWeight = getRandomTileType()
-            self.tiles[nkey] = { type = tType, discovered = false, weight = tWeight }
+            self.tiles[nkey] = {
+                type = tType,
+                discovered = false, -- Mark as unseen
+                seen = true, -- Mark as seen (so it appears as fog)
+                weight = tWeight,
+                yOffset = love.graphics.getHeight() -- Start off-screen
+            }
+
+            -- Animate seen tile upwards
+            flux.to(self.tiles[nkey], 0.5, { yOffset = 0 }):ease("quadout")
         end
     end
 end
+
+
 
 
 function Grid:setTile(x, y, type)
@@ -91,15 +117,15 @@ function Grid:draw()
     for key, tile in pairs(self.tiles) do
         local x, y = key:match("([^,]+),([^,]+)")
         x, y = tonumber(x), tonumber(y)
-        local posX, posY = x * ts, y * ts
+        local posX, posY = x * ts, y * ts + (tile.yOffset or 0) -- Apply animation offset
 
         if tile.discovered then
-            -- Draw discovered tiles normally.
+            -- Draw fully discovered tiles normally
             love.graphics.setColor(1, 1, 1)
             love.graphics.print(tile.type or "?", posX, posY)
-        else
-            -- Draw undiscovered tiles with a fog effect.
-            love.graphics.setColor(0.5, 0.5, 0.5, 0.5) -- semi-transparent gray
+        elseif tile.seen then
+            -- Draw seen but undiscovered tiles with fog effect
+            love.graphics.setColor(0.5, 0.5, 0.5, 0.5) -- Semi-transparent gray
             love.graphics.rectangle("fill", posX, posY, ts, ts)
             love.graphics.setColor(1, 1, 1)
             love.graphics.print(tile.type or "?", posX + ts * 0.25, posY + ts * 0.25)
