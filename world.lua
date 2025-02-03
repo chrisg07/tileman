@@ -6,11 +6,11 @@ local Enemy = require("enemy")
 local World = {}
 World.__index = World
 
-function World:new(tileSize, state)
+function World:new(tileSize, state, fogDistance)
     local self = setmetatable({}, World)
     self.tileSize = tileSize
     self.state = state
-    self.grid = Grid:new(tileSize, state)
+    self.grid = Grid:new(tileSize, state, fogDistance)
     self.character = Character:new(5, 5, tileSize, state, self.grid)
     self.enemies = {}
     table.insert(self.enemies, Enemy:new(10, 10, tileSize, 0.5))

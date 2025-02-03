@@ -27,7 +27,7 @@ function love.load()
     suit.theme.color.normal = { bg = { 0.1, 0.1, 0.1 }, fg = { 1, 1, 1 } }
 
     state = State:new()
-    world = World:new(tileSize, state)
+    world = World:new(tileSize, state, 2)
     menu = Menu:new(state, { "tiles", "energy", "health" })
     contextMenu = ContextMenu:new(tileSize) -- Pass tileSize if needed for coordinate calculations.
     camera = Camera:new(0, 0)

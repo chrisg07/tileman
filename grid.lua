@@ -27,7 +27,7 @@ local function getRandomTileType()
     end
 end
 
-function Grid:new(tileSize, state)
+function Grid:new(tileSize, state, fogDistance)
     local screenWidth, screenHeight = love.graphics.getDimensions()
     local gridWidth = math.floor(screenWidth / tileSize)
     local gridHeight = math.floor(screenHeight / tileSize)
@@ -38,7 +38,8 @@ function Grid:new(tileSize, state)
         tileSize = tileSize,
         state = state,
         tiles = {},
-        growthQueue = {}
+        growthQueue = {},
+        fogDistance = fogDistance or 2 -- Default fog distance if not provided
     }, Grid)
 
     return self
@@ -75,27 +76,31 @@ function Grid:discoverTile(x, y)
         print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 
-    -- Generate surrounding tiles but **mark them as seen, not discovered**
-    local offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} }
-    for _, offset in ipairs(offsets) do
-        local nx, ny = x + offset[1], y + offset[2]
-        local nkey = nx .. "," .. ny
-        if not self.tiles[nkey] then
-            local tType, tWeight = getRandomTileType()
-            self.tiles[nkey] = {
-                type = tType,
-                discovered = false, -- Mark as unseen
-                seen = true, -- Mark as seen (so it appears as fog)
-                weight = tWeight,
-                yOffset = love.graphics.getHeight() -- Start off-screen
-            }
+    -- Generate surrounding tiles, but only those within Manhattan distance
+    for dx = -self.fogDistance, self.fogDistance do
+        for dy = -self.fogDistance, self.fogDistance do
+            local nx, ny = x + dx, y + dy
+            local nkey = nx .. "," .. ny
 
-            -- Animate seen tile upwards
-            flux.to(self.tiles[nkey], 2, { yOffset = 0 }):ease("elasticinout")
+            -- **Manhattan distance condition**
+            if math.abs(dx) + math.abs(dy) <= self.fogDistance then
+                if not self.tiles[nkey] then
+                    local tType, tWeight = getRandomTileType()
+                    self.tiles[nkey] = {
+                        type = tType,
+                        discovered = false, -- Mark as unseen
+                        seen = true, -- Mark as seen (so it appears as fog)
+                        weight = tWeight,
+                        yOffset = love.graphics.getHeight() -- Start off-screen
+                    }
+
+                    -- Animate seen tile upwards
+                    flux.to(self.tiles[nkey], 2, { yOffset = 0 }):ease("elasticinout")
+                end
+            end
         end
     end
 end
-
 
 
 
@@ -129,9 +134,12 @@ function Grid:draw()
             love.graphics.rectangle("fill", posX, posY, ts, ts)
             love.graphics.setColor(1, 1, 1)
             love.graphics.print(tile.type or "?", posX + ts * 0.25, posY + ts * 0.25)
+        else
+            -- Completely undiscovered tiles are not drawn at all
         end
     end
 end
+
 
 
 -- Existing chopping and growth functions remain unchanged.
