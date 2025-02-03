@@ -2,7 +2,8 @@
 
 ## Development
 
-To run the game on MacOS after installing Love: `open -n -a love "../tileman"`
+To run the game on MacOS after installing LOVE: `open -n -a love "../tileman"`
+To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" "C:\Users/Chris Guilliams/Projects/tileman"`
 
 [SUIT](https://github.com/vrld/suit) is used for UI elements
 

@@ -8,7 +8,7 @@ function Menu:new(state, properties)
     return setmetatable({
         state = state,
         properties = properties or {},
-        visible = false,
+        visible = true,
         alpha = 0
     }, self)
 end
@@ -27,12 +27,12 @@ function Menu:update(dt)
     suit.layout:reset(0, 0)
 
     if self.visible then
-        if suit.Button("Close Menu", suit.layout:row(200, 25)).hit then
+        if suit.Button("Close Menu", suit.layout:col(200, 25)).hit then
             self:toggle()
         end
 
         for i, property in ipairs(self.properties) do
-            if suit.Button(property .. ": " .. self.state[property], suit.layout:row(200, 25)).hit then
+            if suit.Button(property .. ": " .. self.state[property], suit.layout:col(200, 25)).hit then
                 self.state[property] = (self.state[property] or 0) + 1
             end
         end
@@ -44,10 +44,6 @@ function Menu:update(dt)
 end
 
 function Menu:draw()
-    if self.visible then
-        love.graphics.setColor(0.1, 0.1, 0.1, 0.9 * self.alpha)
-        love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-    end
 end
 
 return Menu
