@@ -3,6 +3,7 @@ local ContextMenu = {}
 ContextMenu.__index = ContextMenu
 
 local suit = require "suit"
+local Pathfinding = require("pathfinding")
 
 -- Create a new context menu.
 -- Optionally pass tileSize so the module can compute tile coordinates.
@@ -79,8 +80,13 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
     table.insert(self.actions, {
         label = "Move Here",
         callback = function()
-            local Pathfinding = require("pathfinding")
+            -- Ensure tile is discovered before pathfinding
+            if not grid:isDiscovered(tileX, tileY) then
+                grid:discoverTile(tileX, tileY)
+            end
+    
             local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
+    
             if path then
                 local cost = #path - 1 -- Exclude the starting tile.
                 if state:get("energy") >= cost then

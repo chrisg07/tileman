@@ -10,16 +10,20 @@ end
 local function getNeighbors(node, grid)
     local neighbors = {}
     local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+
     for _, d in ipairs(dirs) do
         local nx, ny = node.x + d[1], node.y + d[2]
-        if nx >= 0 and nx < grid.width and ny >= 0 and ny < grid.height then
-            if grid:isDiscovered(nx, ny) then
-                table.insert(neighbors, { x = nx, y = ny })
-            end
+        local key = nx .. "," .. ny
+
+        -- Check if the tile exists and is discovered
+        if grid.tiles[key] and grid.tiles[key].discovered then
+            table.insert(neighbors, { x = nx, y = ny })
         end
     end
+
     return neighbors
 end
+
 
 -- Reconstructs the path from the cameFrom table.
 local function reconstructPath(cameFrom, current)

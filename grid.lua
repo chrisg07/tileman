@@ -27,15 +27,13 @@ local function getProceduralTileType(x, y)
     for _, tile in ipairs(tileTypes) do
         cumulativeWeight = cumulativeWeight + tile.weight
         if scaledNoise <= cumulativeWeight then
-            return tile.type, tile.color -- Return the type and color
+            return tile.type, tile.color, tile.weight -- ✅ Now also returning weight
         end
     end
 
     -- Fallback (should never be reached)
-    return "grass", { 0.1, 0.8, 0.1 } -- Default to grass
+    return "grass", { 0.1, 0.8, 0.1 }, 50 -- Default to grass with weight 50
 end
-
-
 
 function Grid:new(tileSize, state, fogDistance)
     local screenWidth, screenHeight = love.graphics.getDimensions()
@@ -56,7 +54,7 @@ function Grid:new(tileSize, state, fogDistance)
 end
 
 function Grid:createTile(x, y, discovered, seen)
-    local tileType, tileColor = getProceduralTileType(x, y) -- Use Perlin noise
+    local tileType, tileColor, tileWeight = getProceduralTileType(x, y) -- Use Perlin noise
     local key = x .. "," .. y
 
     self.tiles[key] = {
@@ -64,6 +62,7 @@ function Grid:createTile(x, y, discovered, seen)
         discovered = discovered or false,
         seen = seen or false,
         color = tileColor, -- Store procedural color
+        weight = tileWeight, -- ✅ Now storing weight
         yOffset = love.graphics.getHeight() -- Start off-screen
     }
 
@@ -79,19 +78,20 @@ function Grid:discoverTile(x, y)
 
     if not self.tiles[key] then
         self:createTile(x, y, true, true) -- Create discovered tile
-        -- local gain = math.floor(constant / self.tiles[key].weight)
-        -- self.state.skills:addXP("exploration", gain)
-        -- print("Discovered new tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
+        local gain = math.floor(constant / self.tiles[key].weight) -- ✅ No more nil error
+        self.state.skills:addXP("exploration", gain)
+        print("Discovered new tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     elseif not self.tiles[key].discovered then
         self.tiles[key].discovered = true
-        -- local gain = math.floor(constant / self.tiles[key].weight)
-        -- self.state.skills:addXP("exploration", gain)
-        -- print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
+        local gain = math.floor(constant / self.tiles[key].weight)
+        self.state.skills:addXP("exploration", gain)
+        print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
 
     -- Now expand fog separately
     self:expandFog(x, y)
 end
+
 
 function Grid:setTile(x, y, type)
     local key = x .. "," .. y
