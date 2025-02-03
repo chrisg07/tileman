@@ -116,9 +116,9 @@ function Grid:draw()
                 end
             else
                 -- If a tile hasn't been generated yet, you could fill it with black.
-                love.graphics.setColor(0, 0, 0)
-                love.graphics.rectangle("fill", posX, posY, ts, ts)
-                love.graphics.setColor(1, 1, 1)
+                -- love.graphics.setColor(0, 0, 0)
+                -- love.graphics.rectangle("fill", posX, posY, ts, ts)
+                -- love.graphics.setColor(1, 1, 1)
             end
         end
     end
