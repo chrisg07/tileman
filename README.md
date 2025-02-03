@@ -7,7 +7,7 @@ To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" "C:\Users/C
 
 [SUIT](https://github.com/vrld/suit) is used for UI elements
 
-TODO: Look into tweening and how it can be used for some simple but effective animations
+TODO: Decrease character movement speed so tile creation animation can play slower without the player moving off the map
 
 ## Inspiration
 
