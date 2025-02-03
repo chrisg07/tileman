@@ -30,34 +30,40 @@ function Character:setPath(path)
     if #path > 1 then
         -- Start at the second node (since the first node is the current position).
         self.pathIndex = 2
-        if not self.moveTween then
-            local nextTile = self.path[self.pathIndex]
-            local dx = nextTile.x - self.targetX
-            local dy = nextTile.y - self.targetY
-            self.pathIndex = self.pathIndex + 1
-            self:move(dx, dy)
-        end
+        self:moveToNextTile()
     end
 end
 
-function Character:move(dx, dy)
+function Character:moveToNextTile()
+    if self.path and self.pathIndex and self.pathIndex <= #self.path then
+        local nextTile = self.path[self.pathIndex]
+        local dx = nextTile.x - self.targetX
+        local dy = nextTile.y - self.targetY
+        self.pathIndex = self.pathIndex + 1
+        self:move(dx, dy, function()
+            self:moveToNextTile() -- Recursive call to continue movement
+        end)
+    else
+        -- Path complete
+        self.path = nil
+        self.pathIndex = nil
+        print("Path complete")
+    end
+end
+
+function Character:move(dx, dy, onComplete)
     if self.state:get("energy") <= 0 then return end
     if self.moveTween then return end
 
     local newX = self.targetX + dx
     local newY = self.targetY + dy
 
-    -- Ensure that the tile is generated before moving
     if not self.grid:isDiscovered(newX, newY) then
         self.grid:discoverTile(newX, newY)
     end
 
-    -- Energy and tile discovery logic
-    if not self.grid:isDiscovered(newX, newY) and self.state:get("tiles") > 0 then
-        self.grid:discoverTile(newX, newY)
-        self.state:decrement("tiles")
-        self.state:decrement("energy")
-    elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
+    -- Check movement constraints
+    if self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
         self.state:decrement("energy")
     else
         return
@@ -79,8 +85,10 @@ function Character:move(dx, dy)
             self.currentX = targetPixelX
             self.currentY = targetPixelY
             print("Player moved to (" .. newX .. ", " .. newY .. ")")
+            if onComplete then onComplete() end -- Move to the next tile in the path
         end)
 end
+
 
 
 -- Update method now only ensures that if no tween is active, the character's position
