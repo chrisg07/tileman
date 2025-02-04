@@ -5,6 +5,7 @@ local flux = require("flux.flux") -- Adjust the require path as needed
 local Character = {}
 Character.__index = Character
 
+Character.MOVE_SPEED = 1 -- Default move speed in seconds
 
 function Character:new(x, y, tileSize, state, grid)
     grid:discoverTile(x, y)
@@ -23,6 +24,10 @@ function Character:new(x, y, tileSize, state, grid)
         moveTween = nil, -- Reference to the current tween (if any)
         eyeShake = 0,    -- New property: amount of shake in pixels
     }, self)
+end
+
+function Character:setMoveSpeed(speed)
+    self.MOVE_SPEED = speed
 end
 
 -- When a multi-tile path is set (for example via the context menu), we assume that
@@ -51,14 +56,12 @@ function Character:moveToNextTile()
     end
 end
 
-
 -- Updated move method using tweening for movement and triggering an eye shake.
 -- An optional onComplete callback allows chaining.
 function Character:move(dx, dy, onComplete)
     if self.state:get("energy") <= 0 then return end
     if self.moveTween then return end
 
-    -- Remove clamping:
     local newX = self.targetX + dx
     local newY = self.targetY + dy
 
@@ -82,9 +85,9 @@ function Character:move(dx, dy, onComplete)
     local targetPixelY = newY * ts
 
     self.eyeShake = 5
-    flux.to(self, 0.3, { eyeShake = 0 })
+    flux.to(self, self.MOVE_SPEED, { eyeShake = 0 })
 
-    self.moveTween = flux.to(self, 0.3, { currentX = targetPixelX, currentY = targetPixelY })
+    self.moveTween = flux.to(self, self.MOVE_SPEED, { currentX = targetPixelX, currentY = targetPixelY })
         :ease("quadout")
         :oncomplete(function()
             self.moveTween = nil
@@ -103,10 +106,6 @@ function Character:update(dt, tileSize)
         self.currentX = self.targetX * tileSize
         self.currentY = self.targetY * tileSize
     end
-end
-
-function Character:mousemoved(x, y) 
-    mouseX, mouseY = x, y
 end
 
 function Character:draw(tileSize, mouseX, mouseY)
