@@ -19,6 +19,7 @@ local background
 local contextMenu
 local world
 local camera
+mouseX, mouseY = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
 
 function love.load()
     background = Background:new()
@@ -90,3 +91,8 @@ end
 function love.mousepressed(x, y, button)
     contextMenu:handleMousePress(x, y, button, world.grid, world.enemies, world.character, state, camera)
 end
+
+function love.mousemoved(x, y, dx, dy)
+    mouseX, mouseY = x, y
+end
+

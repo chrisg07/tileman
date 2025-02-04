@@ -37,10 +37,11 @@ end
 
 function World:draw()
     self.grid:draw()
-    self.character:draw(self.tileSize)
+    self.character:draw(self.tileSize, mouseX, mouseY) -- Pass mouse position
     for _, enemy in ipairs(self.enemies) do
         enemy:draw()
     end
 end
+
 
 return World
