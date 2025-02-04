@@ -2,7 +2,6 @@
 local Utils = require("utils")
 local flux = require("flux.flux") -- Adjust the require path as needed
 
-local mouseX, mouseY = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
 local Character = {}
 Character.__index = Character
 
@@ -59,8 +58,9 @@ function Character:move(dx, dy, onComplete)
     if self.state:get("energy") <= 0 then return end
     if self.moveTween then return end
 
-    local newX = math.max(0, math.min(self.grid.width - 1, self.targetX + dx))
-    local newY = math.max(0, math.min(self.grid.height - 1, self.targetY + dy))
+    -- Remove clamping:
+    local newX = self.targetX + dx
+    local newY = self.targetY + dy
 
     if not self.grid:isDiscovered(newX, newY) then
         self.grid:discoverTile(newX, newY)
@@ -72,7 +72,6 @@ function Character:move(dx, dy, onComplete)
         return
     end
 
-    -- Set new target and record starting position.
     self.targetX = newX
     self.targetY = newY
     self.startX = self.currentX
@@ -82,11 +81,9 @@ function Character:move(dx, dy, onComplete)
     local targetPixelX = newX * ts
     local targetPixelY = newY * ts
 
-    -- Trigger an eye shake: set a nonzero eyeShake value and tween it back to 0.
-    self.eyeShake = 5  -- Adjust this value to change the shake amplitude.
+    self.eyeShake = 5
     flux.to(self, 0.3, { eyeShake = 0 })
 
-    -- Tween the character's position from the current to target pixel coordinates.
     self.moveTween = flux.to(self, 0.3, { currentX = targetPixelX, currentY = targetPixelY })
         :ease("quadout")
         :oncomplete(function()
@@ -97,6 +94,8 @@ function Character:move(dx, dy, onComplete)
             if onComplete then onComplete() end
         end)
 end
+
+
 
 -- The update method now only ensures that if no tween is active, the position is snapped.
 function Character:update(dt, tileSize)
@@ -131,6 +130,12 @@ function Character:draw(tileSize, mouseX, mouseY)
         dx, dy = (dx / distance) * maxEyeOffset, (dy / distance) * maxEyeOffset
     end
 
+    local shakeX, shakeY = 0, 0
+    if self.eyeShake and self.eyeShake > 0 then
+        shakeX = math.random(-self.eyeShake, self.eyeShake)
+        shakeY = math.random(-self.eyeShake, self.eyeShake)
+    end
+
     -- Draw eyes
     love.graphics.setColor(1, 1, 1) -- White for eyeball
     love.graphics.circle("fill", centerX - eyeOffsetX, centerY - eyeOffsetY, eyeRadius)
@@ -138,9 +143,8 @@ function Character:draw(tileSize, mouseX, mouseY)
 
     -- Draw pupils
     love.graphics.setColor(0, 0, 0) -- Black for pupil
-    love.graphics.circle("fill", centerX - eyeOffsetX + dx, centerY - eyeOffsetY + dy, eyeRadius / 2)
-    love.graphics.circle("fill", centerX + eyeOffsetX + dx, centerY - eyeOffsetY + dy, eyeRadius / 2)
-
+    love.graphics.circle("fill", centerX - eyeOffsetX + dx + shakeX, centerY - eyeOffsetY + dy + shakeY, eyeRadius / 2)
+    love.graphics.circle("fill", centerX + eyeOffsetX + dx + shakeX, centerY - eyeOffsetY + dy + shakeY, eyeRadius / 2)
     -- eye outline
     love.graphics.circle("line", centerX - eyeOffsetX, centerY - eyeOffsetY, eyeRadius)
     love.graphics.circle("line", centerX + eyeOffsetX, centerY - eyeOffsetY, eyeRadius)
