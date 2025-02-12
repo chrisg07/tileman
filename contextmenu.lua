@@ -37,9 +37,9 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
     local tileKey = tileX .. "," .. tileY
     local tile = grid.tiles[tileKey]
 
-    -- Only allow context menu on discovered or seen tiles
-    if not tile or not tile.discovered then
-        print("Tile (" .. tileX .. ", " .. tileY .. ") is not discovered or seen!")
+    -- Only allow context menu on seen tiles
+    if not tile or not tile.seen then
+        print("Tile (" .. tileX .. ", " .. tileY .. ") has not been discovered yet!")
         return
     end
 
@@ -76,31 +76,30 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
         })
     end
 
-    -- Always add a "Move Here" action.
-    table.insert(self.actions, {
-        label = "Move Here",
-        callback = function()
-            -- Ensure tile is discovered before pathfinding
-            if not grid:isDiscovered(tileX, tileY) then
-                grid:discoverTile(tileX, tileY)
-            end
-    
-            local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
-    
-            if path then
-                local cost = #path - 1 -- Exclude the starting tile.
-                if state:get("energy") >= cost then
-                    state.energy = state.energy - cost
-                    print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
-                    character:setPath(path)
+    if tile and tile.seen then 
+        table.insert(self.actions, {
+            label = "Move Here",
+            callback = function()
+                local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
+        
+                if path then
+                    local cost = #path - 1 -- Exclude the starting tile.
+                    if state:get("energy") >= cost then
+                        state.energy = state.energy - cost
+                        print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
+                        character:setPath(path)
+                    else
+                        print("Not enough energy to move!")
+                    end
                 else
-                    print("Not enough energy to move!")
+                    print("No valid path found!")
                 end
-            else
-                print("No valid path found!")
             end
-        end
-    })
+        })
+    end
+
+
+
 
     self.visible = true
 end

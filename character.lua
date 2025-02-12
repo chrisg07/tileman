@@ -69,7 +69,9 @@ function Character:move(dx, dy, onComplete)
         self.grid:discoverTile(newX, newY)
     end
 
-    if self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
+    if self.grid:isSeen(newX, newY) and not self.grid:isDiscovered(newX, newY) then
+        self.state:decrement("tiles")
+    elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
         self.state:decrement("energy")
     else
         return
@@ -97,8 +99,6 @@ function Character:move(dx, dy, onComplete)
             if onComplete then onComplete() end
         end)
 end
-
-
 
 -- The update method now only ensures that if no tween is active, the position is snapped.
 function Character:update(dt, tileSize)

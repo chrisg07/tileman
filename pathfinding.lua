@@ -6,7 +6,7 @@ local function heuristic(x1, y1, x2, y2)
     return math.abs(x1 - x2) + math.abs(y1 - y2)
 end
 
--- Returns neighbors that are within grid bounds and discovered.
+-- Returns neighbors that are within grid bounds and seen.
 local function getNeighbors(node, grid)
     local neighbors = {}
     local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
@@ -15,8 +15,8 @@ local function getNeighbors(node, grid)
         local nx, ny = node.x + d[1], node.y + d[2]
         local key = nx .. "," .. ny
 
-        -- Check if the tile exists and is discovered
-        if grid.tiles[key] and grid.tiles[key].discovered then
+        -- Check if the tile exists and is seen
+        if grid.tiles[key] and grid.tiles[key].seen then
             table.insert(neighbors, { x = nx, y = ny })
         end
     end

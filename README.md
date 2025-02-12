@@ -14,10 +14,18 @@ To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" --console "
     - Stone
     - Tree
     - Water
-- Abilitiy to unlock new tile types when specific criteria are met
+- Ability to unlock new tile types when specific criteria are met
 - Context menu support for undiscovered tiles
 - Display energy required to travel to tile within context menu
-
+- Update character spawning animation so that it appears to 'land' on tiles as they spawn in from the bottom
+- Use voronoio shader for water tiles?
+- Use a world generation method other than Perlin noise
+- Do something with enemy
+- Way to discover tiles without having to move near them
+- Support increase of fog of war radius when specific criteria are met
+- Set title of window to Tileman
+- Ability to increase weighting of rarer tiles for increased energy cost on tile discovery (Prayer?)
+- Make it so that clicking the character generates energy
 
 ## Inspiration
 
@@ -38,6 +46,12 @@ Character's base revolves largely around incremental/idle mechanics. Over time a
 The goal is to build up a 'run' while idling. Players would be rewarded for playing well by making the most of the resources they take on their runs.
 
 A character must 'unlock' tiles. Each time a tile is unlocked various mechanics determine what kind of tile is generated.
+
+### Design Goals
+
+- Emergent world generation rewards continous exploration over time as additional upgrades are obtained
+    - Example: Discover new tiles after purchasing upgrades to size/density of resource tiles
+- The game is "[juicy](https://www.youtube.com/watch?v=Fy0aCDmgnxg)"
 
 ### Base
 

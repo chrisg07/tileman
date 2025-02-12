@@ -10,6 +10,25 @@ local tileTypes = {
     { type = "tree",  weight = 5,  color = { 0.2, 0.6, 0.2 } }   -- Dark green
 }
 
+
+function Grid:new(tileSize, state, fogDistance)
+    local screenWidth, screenHeight = love.graphics.getDimensions()
+    local gridWidth = math.floor(screenWidth / tileSize)
+    local gridHeight = math.floor(screenHeight / tileSize)
+
+    local self = setmetatable({
+        width = gridWidth,
+        height = gridHeight,
+        tileSize = tileSize,
+        state = state,
+        tiles = {},
+        growthQueue = {},
+        fogDistance = fogDistance or 2 -- Default fog distance if not provided
+    }, Grid)
+
+    return self
+end
+
 local function getProceduralTileType(x, y)
     local noiseValue = love.math.noise(x * 0.1, y * 0.1) -- Scale noise frequency
 
@@ -35,23 +54,6 @@ local function getProceduralTileType(x, y)
     return "grass", { 0.1, 0.8, 0.1 }, 50 -- Default to grass with weight 50
 end
 
-function Grid:new(tileSize, state, fogDistance)
-    local screenWidth, screenHeight = love.graphics.getDimensions()
-    local gridWidth = math.floor(screenWidth / tileSize)
-    local gridHeight = math.floor(screenHeight / tileSize)
-
-    local self = setmetatable({
-        width = gridWidth,
-        height = gridHeight,
-        tileSize = tileSize,
-        state = state,
-        tiles = {},
-        growthQueue = {},
-        fogDistance = fogDistance or 2 -- Default fog distance if not provided
-    }, Grid)
-
-    return self
-end
 
 function Grid:createTile(x, y, discovered, seen)
     local tileType, tileColor, tileWeight = getProceduralTileType(x, y) -- Use Perlin noise
@@ -78,7 +80,7 @@ function Grid:discoverTile(x, y)
 
     if not self.tiles[key] then
         self:createTile(x, y, true, true) -- Create discovered tile
-        local gain = math.floor(constant / self.tiles[key].weight) -- ✅ No more nil error
+        local gain = math.floor(constant / self.tiles[key].weight)
         self.state.skills:addXP("exploration", gain)
         print("Discovered new tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     elseif not self.tiles[key].discovered then
@@ -101,6 +103,18 @@ end
 function Grid:isDiscovered(x, y)
     local key = x .. "," .. y
     return self.tiles[key] and self.tiles[key].discovered
+end
+
+function Grid:isSeen(x, y)
+    local key = x .. "," .. y
+    local seen = self.tiles[key] and self.tiles[key].seen
+
+    if seen then 
+        print("Tile at (" .. x .. ", " .. y .. ") has been seen")
+    else
+        print("Tile at (" .. x .. ", " .. y .. ") has not been seen")
+    end
+    return seen
 end
 
 function Grid:expandFog(x, y)
