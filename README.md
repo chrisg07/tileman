@@ -3,11 +3,21 @@
 ## Development
 
 To run the game on MacOS after installing LOVE: `open -n -a love "../tileman"`
-To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" "C:\Users/Chris Guilliams/Projects/tileman"`
+To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" --console "C:\Users/Chris Guilliams/Projects/tileman"`
 
 [SUIT](https://github.com/vrld/suit) is used for UI elements
 
-TODO: Decrease character movement speed so tile creation animation can play slower without the player moving off the map
+## TODO
+
+- Determine order in which new tile types should be unlocked
+    - Grass
+    - Stone
+    - Tree
+    - Water
+- Abilitiy to unlock new tile types when specific criteria are met
+- Context menu support for undiscovered tiles
+- Display energy required to travel to tile within context menu
+
 
 ## Inspiration
 
@@ -15,6 +25,7 @@ TODO: Decrease character movement speed so tile creation animation can play slow
 - Runescape Tileman challenge and leveling system
 - FallenSword
 - Corekeeper Automation
+- Minecraft Skyblock
 - Stardew Valley mine
 - Atypography: [TLOCRT](https://www.atypography.com/product-page/tlocrt-h-v-sq)
 
