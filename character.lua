@@ -69,9 +69,10 @@ function Character:move(dx, dy, onComplete)
         self.grid:discoverTile(newX, newY)
     end
 
-    if self.grid:isSeen(newX, newY) and not self.grid:isDiscovered(newX, newY) then
+    if self.grid:isDiscovered(newX, newY) and not self.grid:isVisited(newX, newY) then
         self.state:decrement("tiles")
-    elseif self.grid:isDiscovered(newX, newY) and self.state:get("energy") > 0 then
+        self.state:decrement("energy")
+    elseif self.grid:isDiscovered(newX, newY) and self.grid:isVisited(newX, newY) then
         self.state:decrement("energy")
     else
         return

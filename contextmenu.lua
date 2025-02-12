@@ -37,8 +37,8 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
     local tileKey = tileX .. "," .. tileY
     local tile = grid.tiles[tileKey]
 
-    -- Only allow context menu on seen tiles
-    if not tile or not tile.seen then
+    -- Only allow context menu on discovered tiles
+    if not tile or not tile.discovered then
         print("Tile (" .. tileX .. ", " .. tileY .. ") has not been discovered yet!")
         return
     end
@@ -76,7 +76,7 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
         })
     end
 
-    if tile and tile.seen then 
+    if tile and tile.discovered then 
         table.insert(self.actions, {
             label = "Move Here",
             callback = function()
@@ -85,7 +85,6 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
                 if path then
                     local cost = #path - 1 -- Exclude the starting tile.
                     if state:get("energy") >= cost then
-                        state.energy = state.energy - cost
                         print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
                         character:setPath(path)
                     else

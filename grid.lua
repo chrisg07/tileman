@@ -55,14 +55,14 @@ local function getProceduralTileType(x, y)
 end
 
 
-function Grid:createTile(x, y, discovered, seen)
+function Grid:createTile(x, y, discovered, visited)
     local tileType, tileColor, tileWeight = getProceduralTileType(x, y) -- Use Perlin noise
     local key = x .. "," .. y
 
     self.tiles[key] = {
         type = tileType,
         discovered = discovered or false,
-        seen = seen or false,
+        visited = visited or false,
         color = tileColor, -- Store procedural color
         weight = tileWeight, -- ✅ Now storing weight
         yOffset = love.graphics.getHeight() -- Start off-screen
@@ -105,16 +105,16 @@ function Grid:isDiscovered(x, y)
     return self.tiles[key] and self.tiles[key].discovered
 end
 
-function Grid:isSeen(x, y)
+function Grid:isVisited(x, y)
     local key = x .. "," .. y
-    local seen = self.tiles[key] and self.tiles[key].seen
+    local visited = self.tiles[key] and self.tiles[key].visited
 
-    if seen then 
-        print("Tile at (" .. x .. ", " .. y .. ") has been seen")
+    if visited then 
+        print("Tile at (" .. x .. ", " .. y .. ") has been visited")
     else
-        print("Tile at (" .. x .. ", " .. y .. ") has not been seen")
+        print("Tile at (" .. x .. ", " .. y .. ") has not been visited")
     end
-    return seen
+    return visited
 end
 
 function Grid:expandFog(x, y)
@@ -125,7 +125,7 @@ function Grid:expandFog(x, y)
 
             if math.abs(dx) + math.abs(dy) <= self.fogDistance then
                 if not self.tiles[nkey] then
-                    self:createTile(nx, ny, false, true) -- Procedurally generate fog tiles
+                    self:createTile(nx, ny, true, false) -- Procedurally generate fog tiles
                 end
             end
         end
@@ -152,7 +152,7 @@ end
 
 function Grid:drawTile(x, y, tile)
     local r, g, b = unpack(tile.color or { 1, 1, 1 }) -- Default to white if no color
-    local alpha = tile.discovered and 1 or 0.5 -- Fog effect
+    local alpha = tile.visited and 1 or 0.5 -- Fog effect
 
     love.graphics.setColor(r, g, b, alpha)
     love.graphics.rectangle("fill", x, y, self.tileSize, self.tileSize)
