@@ -9,6 +9,7 @@ Character.MOVE_SPEED = 1 -- Default move speed in seconds
 
 function Character:new(x, y, tileSize, state, grid)
     grid:discoverTile(x, y)
+    grid:expandFog(x, y)
     return setmetatable({
         targetX = x,
         targetY = y,
@@ -65,14 +66,13 @@ function Character:move(dx, dy, onComplete)
     local newX = self.targetX + dx
     local newY = self.targetY + dy
 
-    if not self.grid:isDiscovered(newX, newY) then
-        self.grid:discoverTile(newX, newY)
-    end
-
-    if self.grid:isDiscovered(newX, newY) and not self.grid:isVisited(newX, newY) then
+    local currentTile = self.grid:getTile(newX, newY)
+    if currentTile.discovered and not currentTile.visited then
         self.state:decrement("tiles")
         self.state:decrement("energy")
-    elseif self.grid:isDiscovered(newX, newY) and self.grid:isVisited(newX, newY) then
+        currentTile.visited = true
+        self.grid:expandFog(newX, newY)
+    elseif currentTile.discovered and currentTile.visited then
         self.state:decrement("energy")
     else
         return

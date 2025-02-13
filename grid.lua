@@ -68,9 +68,7 @@ function Grid:createTile(x, y, discovered, visited)
         yOffset = love.graphics.getHeight() -- Start off-screen
     }
 
-    -- Apply animation
     self:animateTile(key)
-
     return self.tiles[key]
 end
 
@@ -89,11 +87,12 @@ function Grid:discoverTile(x, y)
         self.state.skills:addXP("exploration", gain)
         print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
     end
-
-    -- Now expand fog separately
-    self:expandFog(x, y)
 end
 
+function Grid:getTile(x, y)
+    local key = x .. "," .. y
+    return self.tiles[key]
+end
 
 function Grid:setTile(x, y, type)
     local key = x .. "," .. y
@@ -162,7 +161,6 @@ function Grid:drawTile(x, y, tile)
     love.graphics.print(tile.type or "?", x + self.tileSize * 0.25, y + self.tileSize * 0.25)
 end
 
--- Existing chopping and growth functions remain unchanged.
 function Grid:chopTree(x, y)
     local key = x .. "," .. y
     if self.tiles[key] and self.tiles[key].type == "tree" then
