@@ -19,6 +19,7 @@ end
 function Skills:addXP(skillName, amount)
     if self.skills[skillName] then
         self.skills[skillName]:addXP(amount)
+        print("Gained " .. amount .. " experience in " .. skillName)
     else
         print("Skill '" .. skillName .. "' does not exist!")
     end

@@ -73,18 +73,10 @@ end
 
 function Grid:discoverTile(x, y)
     local key = x .. "," .. y
-    local constant = 50 -- XP reward scaling factor
 
     if not self.tiles[key] then
-        self:createTile(x, y, true, true) -- Create discovered tile
-        local gain = math.floor(constant / self.tiles[key].weight)
-        self.state.skills:addXP("exploration", gain)
-        print("Discovered new tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
-    elseif not self.tiles[key].discovered then
-        self.tiles[key].discovered = true
-        local gain = math.floor(constant / self.tiles[key].weight)
-        self.state.skills:addXP("exploration", gain)
-        print("Discovered tile (" .. x .. ", " .. y .. "): " .. self.tiles[key].type .. " gained " .. gain .. " exp")
+        self:createTile(x, y, true, true)
+        print("Discovered new tile at (" .. x .. ", " .. y .. ")")
     end
 end
 

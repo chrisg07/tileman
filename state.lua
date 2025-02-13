@@ -1,4 +1,4 @@
--- state.lua
+local Camera = require("camera")
 local Skills = require "skills"
 local State = {}
 State.__index = State
@@ -11,6 +11,8 @@ function State:new()
         health = 1,
         experience = 0,
         skills = Skills:new(),
+        tileSize = 50,
+        camera = Camera:new(0, 0)
     }, self)
 end
 

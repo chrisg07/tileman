@@ -67,7 +67,7 @@ function Character:move(dx, dy, onComplete)
     local newX = self.targetX + dx
     local newY = self.targetY + dy
     local currentTile = self.grid:getTile(newX, newY)
-    
+
     if self.state:get("tiles") <= 0 and not currentTile.visited then return end
 
     if currentTile.discovered and not currentTile.visited then
@@ -76,7 +76,7 @@ function Character:move(dx, dy, onComplete)
         
         local constant = 50
         local gain = math.floor(constant / currentTile.weight)
-        print("Visited a tile for the first time at (" .. newX .. ", " .. newY .. "): " .. currentTile.type .. " gained " .. gain .. " exp")
+        print("Visited a tile for the first time at (" .. newX .. ", " .. newY .. ")")
         self.state.skills:addXP("exploration", gain)
         currentTile.visited = true
         self.grid:expandFog(newX, newY)
@@ -118,7 +118,7 @@ function Character:update(dt, tileSize)
 end
 
 function Character:draw(tileSize, mouseX, mouseY)
-    local triangleVertices = Utils.getTriangleVertices(self.currentX, self.currentY, tileSize, 0.6)
+    local triangleVertices = Utils.getTriangleVertices(self.currentX, self.currentY, self.state.tileSize, 0.6)
     love.graphics.polygon("fill", triangleVertices)
 
     -- Eye positioning relative to triangle
@@ -174,6 +174,18 @@ end
 function Character:attack(enemy)
     print("Attacking enemy at (" .. enemy.x .. ", " .. enemy.y .. ")")
     -- Attack logic would go here.
+end
+
+function Character:handleMousePress(x, y, button)
+    if button == 1 then
+        local triangleVertices = Utils.getTriangleVertices(self.currentX, self.currentY, self.state.tileSize, 0.6)
+        local screenVertices = Utils.offsetVertices(triangleVertices, self.state.camera)
+
+        if Utils.pointInTriangle(x, y, screenVertices) then
+            self.state.energy = self.state.energy + 1
+            print("Generated energy by selecting the character")
+        end
+    end
 end
 
 return Character
