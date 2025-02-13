@@ -10,6 +10,7 @@ Character.MOVE_SPEED = 1 -- Default move speed in seconds
 function Character:new(x, y, tileSize, state, grid)
     grid:discoverTile(x, y)
     grid:expandFog(x, y)
+
     return setmetatable({
         targetX = x,
         targetY = y,
@@ -65,11 +66,18 @@ function Character:move(dx, dy, onComplete)
 
     local newX = self.targetX + dx
     local newY = self.targetY + dy
-
     local currentTile = self.grid:getTile(newX, newY)
+    
+    if self.state:get("tiles") <= 0 and not currentTile.visited then return end
+
     if currentTile.discovered and not currentTile.visited then
         self.state:decrement("tiles")
         self.state:decrement("energy")
+        
+        local constant = 50
+        local gain = math.floor(constant / currentTile.weight)
+        print("Visited a tile for the first time at (" .. newX .. ", " .. newY .. "): " .. currentTile.type .. " gained " .. gain .. " exp")
+        self.state.skills:addXP("exploration", gain)
         currentTile.visited = true
         self.grid:expandFog(newX, newY)
     elseif currentTile.discovered and currentTile.visited then

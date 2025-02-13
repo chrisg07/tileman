@@ -10,7 +10,6 @@ local tileTypes = {
     { type = "tree",  weight = 5,  color = { 0.2, 0.6, 0.2 } }   -- Dark green
 }
 
-
 function Grid:new(tileSize, state, fogDistance)
     local screenWidth, screenHeight = love.graphics.getDimensions()
     local gridWidth = math.floor(screenWidth / tileSize)
@@ -46,7 +45,7 @@ local function getProceduralTileType(x, y)
     for _, tile in ipairs(tileTypes) do
         cumulativeWeight = cumulativeWeight + tile.weight
         if scaledNoise <= cumulativeWeight then
-            return tile.type, tile.color, tile.weight -- ✅ Now also returning weight
+            return tile.type, tile.color, tile.weight
         end
     end
 
