@@ -9,7 +9,7 @@ World.__index = World
 function World:new(state, fogDistance)
     local self = setmetatable({}, World)
     self.state = state
-    self.grid = Grid:new(state.tileSize, state, fogDistance)
+    self.grid = Grid:new(state, fogDistance)
     self.character = Character:new(0, 0, state, self.grid)
     self.enemies = {}
     table.insert(self.enemies, Enemy:new(10, 10, state.tileSize, 0.5))

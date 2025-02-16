@@ -10,15 +10,14 @@ local tileTypes = {
     { type = "tree",  weight = 5,  color = { 0.2, 0.6, 0.2 } }   -- Dark green
 }
 
-function Grid:new(tileSize, state, fogDistance)
+function Grid:new(state, fogDistance)
     local screenWidth, screenHeight = love.graphics.getDimensions()
-    local gridWidth = math.floor(screenWidth / tileSize)
-    local gridHeight = math.floor(screenHeight / tileSize)
+    local gridWidth = math.floor(screenWidth / state.tileSize)
+    local gridHeight = math.floor(screenHeight / state.tileSize)
 
     local self = setmetatable({
         width = gridWidth,
         height = gridHeight,
-        tileSize = tileSize,
         state = state,
         tiles = {},
         growthQueue = {},
@@ -130,7 +129,7 @@ end
 -- Discovered tiles are drawn normally.
 -- Undiscovered tiles (but pre-generated) are drawn foggy with their type shown in a faded way.
 function Grid:draw()
-    local ts = self.tileSize
+    local ts = self.state.tileSize
     for key, tile in pairs(self.tiles) do
         local x, y = key:match("([^,]+),([^,]+)")
         x, y = tonumber(x), tonumber(y)
@@ -145,11 +144,11 @@ function Grid:drawTile(x, y, tile)
     local alpha = tile.visited and 1 or 0.5 -- Fog effect
 
     love.graphics.setColor(r, g, b, alpha)
-    love.graphics.rectangle("fill", x, y, self.tileSize, self.tileSize)
+    love.graphics.rectangle("fill", x, y, self.state.tileSize, self.state.tileSize)
 
     -- Draw text in white for contrast
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print(tile.type or "?", x + self.tileSize * 0.25, y + self.tileSize * 0.25)
+    love.graphics.print(tile.type or "?", x + self.state.tileSize * 0.25, y + self.state.tileSize * 0.25)
 end
 
 function Grid:chopTree(x, y)

@@ -30,6 +30,7 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
     local adjustedY = y + state.camera.y
 
     -- Convert world coordinates to tile coordinates
+    -- TODO: move logic for determing selected tile to Grid
     local tileX = math.floor(adjustedX / self.tileSize)
     local tileY = math.floor(adjustedY / self.tileSize)
 
