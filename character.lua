@@ -7,17 +7,17 @@ Character.__index = Character
 
 Character.MOVE_SPEED = 1 -- Default move speed in seconds
 
-function Character:new(x, y, tileSize, state, grid)
+function Character:new(x, y, state, grid)
     grid:discoverTile(x, y)
     grid:expandFog(x, y)
 
     return setmetatable({
         targetX = x,
         targetY = y,
-        startX = x * tileSize,
-        startY = y * tileSize,
-        currentX = x * tileSize,
-        currentY = y * tileSize,
+        startX = x * state.tileSize,
+        startY = y * state.tileSize,
+        currentX = x * state.tileSize,
+        currentY = y * state.tileSize,
         state = state,
         grid = grid,
         hasMoved = false,
@@ -91,9 +91,8 @@ function Character:move(dx, dy, onComplete)
     self.startX = self.currentX
     self.startY = self.currentY
 
-    local ts = self.grid.tileSize
-    local targetPixelX = newX * ts
-    local targetPixelY = newY * ts
+    local targetPixelX = newX * self.state.tileSize
+    local targetPixelY = newY * self.state.tileSize
 
     self.eyeShake = 5
     flux.to(self, self.MOVE_SPEED, { eyeShake = 0 })
@@ -110,24 +109,24 @@ function Character:move(dx, dy, onComplete)
 end
 
 -- The update method now only ensures that if no tween is active, the position is snapped.
-function Character:update(dt, tileSize)
+function Character:update(dt)
     if not self.moveTween then
-        self.currentX = self.targetX * tileSize
-        self.currentY = self.targetY * tileSize
+        self.currentX = self.targetX * self.state.tileSize
+        self.currentY = self.targetY * self.state.tileSize
     end
 end
 
-function Character:draw(tileSize, mouseX, mouseY)
+function Character:draw(mouseX, mouseY)
     local triangleVertices = Utils.getTriangleVertices(self.currentX, self.currentY, self.state.tileSize, 0.6)
     love.graphics.polygon("fill", triangleVertices)
 
     -- Eye positioning relative to triangle
-    local eyeOffsetX = tileSize * 0.1
-    local eyeOffsetY = tileSize * 0.1
-    local eyeRadius = tileSize * 0.11
+    local eyeOffsetX = self.state.tileSize * 0.1
+    local eyeOffsetY = self.state.tileSize * 0.1
+    local eyeRadius = self.state.tileSize * 0.11
 
-    local centerX = self.currentX + tileSize / 2
-    local centerY = self.currentY + tileSize / 2
+    local centerX = self.currentX + self.state.tileSize / 2
+    local centerY = self.currentY + self.state.tileSize / 2
 
     -- Compute eye movement direction towards mouse
     local dx, dy = mouseX - centerX, mouseY - centerY

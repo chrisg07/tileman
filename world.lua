@@ -6,20 +6,19 @@ local Enemy = require("enemy")
 local World = {}
 World.__index = World
 
-function World:new(tileSize, state, fogDistance)
+function World:new(state, fogDistance)
     local self = setmetatable({}, World)
-    self.tileSize = tileSize
     self.state = state
-    self.grid = Grid:new(tileSize, state, fogDistance)
-    self.character = Character:new(5, 5, tileSize, state, self.grid)
+    self.grid = Grid:new(state.tileSize, state, fogDistance)
+    self.character = Character:new(0, 0, state, self.grid)
     self.enemies = {}
-    table.insert(self.enemies, Enemy:new(10, 10, tileSize, 0.5))
+    table.insert(self.enemies, Enemy:new(10, 10, state.tileSize, 0.5))
 
     return self
 end
 
 function World:update(dt, bounceDuration, overshoot)
-    self.character:update(dt, self.tileSize, bounceDuration, overshoot)
+    self.character:update(dt, self.state.tileSize, bounceDuration, overshoot)
 
     if self.character.hasMoved then
         for _, enemy in ipairs(self.enemies) do
@@ -37,7 +36,7 @@ end
 
 function World:draw()
     self.grid:draw()
-    self.character:draw(self.tileSize, mouseX, mouseY) -- Pass mouse position
+    self.character:draw(self.state.tileSize, mouseX, mouseY) -- Pass mouse position
     for _, enemy in ipairs(self.enemies) do
         enemy:draw()
     end

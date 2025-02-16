@@ -20,13 +20,13 @@ mouseX, mouseY = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
 function love.load()
     background = Background:new()
 
-    -- Set SUIT theme 
+    -- Set SUIT theme
     suit.theme.color.normal = { bg = { 0.1, 0.1, 0.1 }, fg = { 1, 1, 1 } }
 
     state = State:new()
-    world = World:new(state.tileSize, state, 1)
+    world = World:new(state, 1)
     menu = Menu:new(state, { "tiles", "energy", "health" })
-    contextMenu = ContextMenu:new(state.tileSize) 
+    contextMenu = ContextMenu:new(state.tileSize)
 end
 
 function love.keypressed(key)
@@ -58,8 +58,8 @@ function love.update(dt)
     -- Update camera so that the character is centered.
     local screenWidth, screenHeight = love.graphics.getDimensions()
     -- Calculate camera position so that character.currentX/currentY are centered.
-    local camX = world.character.currentX - screenWidth / 2 + world.grid.tileSize / 2
-    local camY = world.character.currentY - screenHeight / 2 + world.grid.tileSize / 2
+    local camX = world.character.currentX - screenWidth / 2 + state.tileSize / 2
+    local camY = world.character.currentY - screenHeight / 2 + state.tileSize / 2
     state.camera:setPosition(camX, camY)
 end
 
@@ -69,7 +69,7 @@ function love.draw()
     -- Apply camera transform so that world is drawn relative to the camera.
     state.camera:apply()
     world:draw()
-    state.camera:reset()     -- reset the transformation
+    state.camera:reset() -- reset the transformation
 
     menu:draw()
     contextMenu:draw()
@@ -89,4 +89,3 @@ end
 function love.mousemoved(x, y, dx, dy)
     mouseX, mouseY = x, y
 end
-

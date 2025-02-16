@@ -14,6 +14,10 @@ To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" --console "
     - Stone
     - Tree
     - Water
+- Add feature to allow selection of starting tile (or adjacent tile). Options are:
+    - Coal
+    - Tree
+    - Water
 - Ability to unlock new tile types when specific criteria are met
 - Context menu support for undiscovered tiles
 - Display energy required to travel to tile within context menu
@@ -75,6 +79,7 @@ Rarer resources the lower you go.
 - Max number of tiles that a floor can contain
 - Increase max stack size of items
 - Increase backpack size
+- Reduce cost scaling for tiles
 - Increase max number of items retained on death
 - Max energy
 - Reduce respawn time for trees
