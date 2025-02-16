@@ -5,8 +5,6 @@ local flux = require("flux.flux") -- Adjust the require path as needed
 local Character = {}
 Character.__index = Character
 
-Character.MOVE_SPEED = 1 -- Default move speed in seconds
-
 function Character:new(x, y, state, grid)
     grid:discoverTile(x, y)
     grid:expandFog(x, y)
@@ -26,10 +24,6 @@ function Character:new(x, y, state, grid)
         moveTween = nil, -- Reference to the current tween (if any)
         eyeShake = 0,    -- New property: amount of shake in pixels
     }, self)
-end
-
-function Character:setMoveSpeed(speed)
-    self.MOVE_SPEED = speed
 end
 
 -- When a multi-tile path is set (for example via the context menu), we assume that
@@ -95,9 +89,9 @@ function Character:move(dx, dy, onComplete)
     local targetPixelY = newY * self.state.tileSize
 
     self.eyeShake = 5
-    flux.to(self, self.MOVE_SPEED, { eyeShake = 0 })
+    flux.to(self, self.state.moveSpeed, { eyeShake = 0 })
 
-    self.moveTween = flux.to(self, self.MOVE_SPEED, { currentX = targetPixelX, currentY = targetPixelY })
+    self.moveTween = flux.to(self, self.state.moveSpeed, { currentX = targetPixelX, currentY = targetPixelY })
         :ease("quadout")
         :oncomplete(function()
             self.moveTween = nil

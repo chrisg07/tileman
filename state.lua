@@ -12,6 +12,7 @@ function State:new()
         experience = 0,
         skills = Skills:new(),
         tileSize = 50,
+        moveSpeed = 1,
         camera = Camera:new(0, 0)
     }, self)
 end
