@@ -24,10 +24,10 @@ end
 --   enemies: the list of enemies
 --   character: the player character (to perform actions)
 --   state: the game state (for checking mode, energy, etc.)
-function ContextMenu:open(x, y, grid, enemies, character, state, camera)
+function ContextMenu:open(x, y, grid, enemies, character, state)
     -- Adjust for camera position to get world coordinates
-    local adjustedX = x + camera.x
-    local adjustedY = y + camera.y
+    local adjustedX = x + state.camera.x
+    local adjustedY = y + state.camera.y
 
     -- Convert world coordinates to tile coordinates
     local tileX = math.floor(adjustedX / self.tileSize)
@@ -43,7 +43,7 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
         return
     end
 
-    self.x = x -- Keep menu at screen position (not world position)
+    self.x = x        -- Keep menu at screen position (not world position)
     self.y = y
     self.actions = {} -- Clear previous actions
 
@@ -76,12 +76,12 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
         })
     end
 
-    if tile and tile.discovered then 
+    if tile and tile.discovered then
         table.insert(self.actions, {
             label = "Move Here",
             callback = function()
                 local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
-        
+
                 if path then
                     local cost = #path - 1 -- Exclude the starting tile.
                     if state:get("energy") >= cost then
@@ -103,13 +103,11 @@ function ContextMenu:open(x, y, grid, enemies, character, state, camera)
     self.visible = true
 end
 
-
-
 -- This method can be called from love.mousepressed to let the context menu handle the right-click.
 -- Pass in all necessary dependencies.
-function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state, camera)
+function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
     if button == 2 then -- Right-click in game mode
-        self:open(x, y, grid, enemies, character, state, camera)
+        self:open(x, y, grid, enemies, character, state)
     end
 end
 

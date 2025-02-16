@@ -73,7 +73,7 @@ function Character:move(dx, dy, onComplete)
     if currentTile.discovered and not currentTile.visited then
         self.state:decrement("tiles")
         self.state:decrement("energy")
-        
+
         local constant = 50
         local gain = math.floor(constant / currentTile.weight)
         print("Visited a tile for the first time at (" .. newX .. ", " .. newY .. ")")
@@ -132,7 +132,7 @@ function Character:draw(tileSize, mouseX, mouseY)
     -- Compute eye movement direction towards mouse
     local dx, dy = mouseX - centerX, mouseY - centerY
     local distance = math.sqrt(dx * dx + dy * dy)
-    local maxEyeOffset = eyeRadius / 2  -- Adjusted maximum offset
+    local maxEyeOffset = eyeRadius / 2 -- Adjusted maximum offset
 
     if distance > 0 then
         dx, dy = (dx / distance) * maxEyeOffset, (dy / distance) * maxEyeOffset
@@ -159,7 +159,6 @@ function Character:draw(tileSize, mouseX, mouseY)
 
     love.graphics.setColor(1, 1, 1) -- Reset color
 end
-
 
 function Character:chopTree(tileX, tileY)
     local key = tileX .. "," .. tileY

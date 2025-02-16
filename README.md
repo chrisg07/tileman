@@ -18,7 +18,7 @@ To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" --console "
 - Context menu support for undiscovered tiles
 - Display energy required to travel to tile within context menu
 - Update character spawning animation so that it appears to 'land' on tiles as they spawn in from the bottom
-- Use voronoio shader for water tiles?
+- Use voronoi shader for water tiles?
 - Use a world generation method other than Perlin noise
 - Do something with enemy
 - Way to discover tiles without having to move near them
