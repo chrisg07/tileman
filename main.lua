@@ -71,9 +71,9 @@ function love.draw()
     world:draw()
     state.camera:reset() -- reset the transformation
 
-    menu:draw()
     contextMenu:draw()
     suit.draw()
+    menu:draw()
 
     -- Draw all skill progress bars starting at (400, 50),
     -- with each bar 200px wide, 20px tall, and 20px vertical spacing.

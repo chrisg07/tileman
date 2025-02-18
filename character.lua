@@ -55,7 +55,7 @@ end
 -- Updated move method using tweening for movement and triggering an eye shake.
 -- An optional onComplete callback allows chaining.
 function Character:move(dx, dy, onComplete)
-    if self.state:get("energy") <= 0 then return end
+    -- if self.state:get("energy") <= 0 then return end
     if self.moveTween then return end
 
     local newX = self.targetX + dx
@@ -66,7 +66,7 @@ function Character:move(dx, dy, onComplete)
 
     if currentTile.discovered and not currentTile.visited then
         self.state:decrement("tiles")
-        self.state:decrement("energy")
+        -- self.state:decrement("energy")
 
         local constant = 50
         local gain = math.floor(constant / currentTile.weight)
@@ -75,7 +75,7 @@ function Character:move(dx, dy, onComplete)
         currentTile.visited = true
         self.grid:expandFog(newX, newY)
     elseif currentTile.discovered and currentTile.visited then
-        self.state:decrement("energy")
+        -- self.state:decrement("energy")
     else
         return
     end
