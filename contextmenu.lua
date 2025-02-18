@@ -84,13 +84,7 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
                 local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
 
                 if path then
-                    local cost = #path - 1 -- Exclude the starting tile.
-                    if state:get("energy") >= cost then
-                        print("Energy cost: " .. cost .. " | Remaining energy: " .. state.energy)
-                        character:setPath(path)
-                    else
-                        print("Not enough energy to move!")
-                    end
+                    character:setPath(path)
                 else
                     print("No valid path found!")
                 end

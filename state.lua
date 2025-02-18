@@ -1,15 +1,14 @@
 local Camera = require("camera")
 local Skills = require "skills"
+local Stats = require "stats"
+
 local State = {}
 State.__index = State
 
 function State:new()
     return setmetatable({
         mode = "menu",
-        tiles = 0,
-        energy = 0,
-        health = 1,
-        experience = 0,
+        stats = Stats:new(),
         skills = Skills:new(),
         tileSize = 50,
         moveSpeed = 1,

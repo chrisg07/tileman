@@ -1,21 +1,17 @@
--- skills.lua
 local Skill = require "skill"
 local Skills = {}
 Skills.__index = Skills
 
 function Skills:new()
     local self = setmetatable({}, Skills)
-    -- Initialize your skills here. For ordering purposes, you can store skills in a table.
     self.skills = {
         mining = Skill:new("mining", 0, 1, 100),
         exploration = Skill:new("exploration", 0, 1, 100),
         woodcutting = Skill:new("woodcutting", 0, 1, 100)
-        -- Add more skills as needed.
     }
     return self
 end
 
--- Add XP to a given skill.
 function Skills:addXP(skillName, amount)
     if self.skills[skillName] then
         self.skills[skillName]:addXP(amount)
@@ -25,7 +21,6 @@ function Skills:addXP(skillName, amount)
     end
 end
 
--- Get a reference to a skill.
 function Skills:get(skillName)
     return self.skills[skillName]
 end

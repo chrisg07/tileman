@@ -25,7 +25,7 @@ function love.load()
 
     state = State:new()
     world = World:new(state, 1)
-    menu = Menu:new(state, { "tiles", "energy", "health" })
+    menu = Menu:new(state)
     contextMenu = ContextMenu:new(state.tileSize)
 end
 
