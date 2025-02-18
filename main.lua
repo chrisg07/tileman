@@ -78,7 +78,13 @@ function love.draw()
     -- Draw all skill progress bars starting at (400, 50),
     -- with each bar 200px wide, 20px tall, and 20px vertical spacing.
     local skillBarPadding = 25
-    state.skills:drawProgressBars(600 - skillBarPadding, skillBarPadding, 200, 20, skillBarPadding)
+    if state.showStats then
+        state.stats:drawProgressBars(600 - skillBarPadding, skillBarPadding, 200, 20, skillBarPadding)
+    end
+
+    if state.showSkills then 
+        state.skills:drawProgressBars(600 - skillBarPadding, skillBarPadding, 200, 20, skillBarPadding)
+    end
 end
 
 function love.mousepressed(x, y, button)

@@ -30,13 +30,24 @@ function Menu:update(dt)
             self:toggle()
         end
 
-        -- print(self.state.stats.stats)
+        if suit.Button("Show Skills", suit.layout:col(200, 25)).hit then
+            self.state.showSkills = not self.state.showSkills
+            self.state.showStats = false
+        end
+
+        if suit.Button("Show Stats", suit.layout:col(200, 25)).hit then
+            self.state.showStats = not self.state.showStats
+            self.state.showSkills = false
+        end
+
+        
+    suit.layout:reset(0, 25)
+
         for i, stat in pairs(self.state.stats.stats) do
             if suit.Button(stat.name .. ": " .. stat.amount, suit.layout:row(200, 25)).hit then
                 stat:add(1)
             end
         end
-        
     else
         if suit.Button("Open Menu", suit.layout:row(200, 25)).hit then
             self:toggle()
