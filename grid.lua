@@ -84,6 +84,11 @@ function Grid:getTile(x, y)
     return self.tiles[key]
 end
 
+function Grid:setVisited(x, y, bool)
+    local key = x .. "," .. y
+    self.tiles[key] = bool
+end
+
 function Grid:setTile(x, y, type)
     local key = x .. "," .. y
     self.tiles[key] = { type = type, discovered = true }
