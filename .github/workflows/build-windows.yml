@@ -62,11 +62,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Tileman_Windows_x86
-          path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x86.zip      - name: Upload 64-bit artifact
+          path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x86.zip
+      - name: Upload 64-bit artifact
         uses: actions/upload-artifact@v4
         with:
           name: Tileman_Windows_x64
-          path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x64.zip      - name: Upload installer artifact
+          path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x64.zip      
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: Tileman_Windows_installer
