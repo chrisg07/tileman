@@ -34,6 +34,7 @@ jobs:
             path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
   build-windows:
     runs-on: windows-latest
+    needs: [build-core]
     env:
       OUTPUT_FOLDER: ./build
     steps:
