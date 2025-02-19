@@ -25,31 +25,32 @@ function Menu:update(dt)
 
     suit.layout:reset(0, 0)
 
+    local menuButtonWidth = 125
     if self.visible then
-        if suit.Button("Close Menu", suit.layout:col(200, 25)).hit then
+        if suit.Button("Close Menu", suit.layout:col(menuButtonWidth, 25)).hit then
             self:toggle()
         end
 
-        if suit.Button("Show Skills", suit.layout:col(200, 25)).hit then
+        if suit.Button("Show Skills", suit.layout:col(menuButtonWidth, 25)).hit then
             self.state.showSkills = not self.state.showSkills
             self.state.showStats = false
         end
 
-        if suit.Button("Show Stats", suit.layout:col(200, 25)).hit then
+        if suit.Button("Show Stats", suit.layout:col(menuButtonWidth, 25)).hit then
             self.state.showStats = not self.state.showStats
             self.state.showSkills = false
         end
 
         
-    suit.layout:reset(0, 25)
+        -- suit.layout:reset(0, 25)
 
-        for i, stat in pairs(self.state.stats.stats) do
-            if suit.Button(stat.name .. ": " .. stat.amount, suit.layout:row(200, 25)).hit then
-                stat:add(1)
-            end
-        end
+        -- for i, stat in pairs(self.state.stats.stats) do
+        --     if suit.Button(stat.name .. ": " .. stat.amount, suit.layout:row(menuButtonWidth, 25)).hit then
+        --         stat:add(1)
+        --     end
+        -- end
     else
-        if suit.Button("Open Menu", suit.layout:row(200, 25)).hit then
+        if suit.Button("Open Menu", suit.layout:row(menuButtonWidth, 25)).hit then
             self:toggle()
         end
     end

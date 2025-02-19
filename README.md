@@ -7,30 +7,6 @@ To run the game on Windows after installing LOVE: `"E:LOVE\love.exe" --console "
 
 [SUIT](https://github.com/vrld/suit) is used for UI elements
 
-## TODO
-
-- Determine order in which new tile types should be unlocked
-    - Grass
-    - Stone
-    - Tree
-    - Water
-- Add feature to allow selection of starting tile (or adjacent tile). Options are:
-    - Coal
-    - Tree
-    - Water
-- Ability to unlock new tile types when specific criteria are met
-- Context menu support for undiscovered tiles
-- Display energy required to travel to tile within context menu
-- Update character spawning animation so that it appears to 'land' on tiles as they spawn in from the bottom
-- Use voronoi shader for water tiles?
-- Use a world generation method other than Perlin noise
-- Do something with enemy
-- Way to discover tiles without having to move near them
-- Support increase of fog of war radius when specific criteria are met
-- Set title of window to Tileman
-- Ability to increase weighting of rarer tiles for increased energy cost on tile discovery (Prayer?)
-- Make it so that clicking the character generates energy
-
 ## Inspiration
 
 - Balatro for language/framework

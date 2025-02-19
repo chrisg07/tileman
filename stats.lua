@@ -4,7 +4,6 @@ Stats.__index = Stats
 
 function Stats:new()
     local self = setmetatable({}, Stats)
-    -- Initialize your stats here. For ordering purposes, you can store stats in a table.
     self.stats = {
         tiles = Stat:new("tiles", 1, 100),
         health = Stat:new("health", 1, 100),
@@ -19,13 +18,12 @@ end
 function Stats:add(statName, amount)
     if self.stats[statName] then
         self.stats[statName]:add(amount)
-        print("Gained " .. amount .. " experience in " .. statName)
+        print("Gained " .. amount .. " in " .. statName)
     else
         print("Stat '" .. statName .. "' does not exist!")
     end
 end
 
--- Get a reference to a stat.
 function Stats:get(statName)
     return self.stats[statName]
 end
@@ -61,9 +59,9 @@ function Stats:drawProgressBars(x, y, width, height, spacing)
     for name, stat in pairs(self.stats) do
         local posX = x
         local posY = y + i * (height + spacing)
-        local percent = stat:getPercent()
-        drawProgressBar(posX, posY, width, height, percent, stat.scale)
-        love.graphics.print(stat.name .. " Lvl " .. stat.amount, posX, posY + height + 5)
+        -- local percent = stat:getPercent()
+        -- drawProgressBar(posX, posY, width, height, percent, stat.scale)
+        love.graphics.print(stat.name .. ": " .. stat.amount, posX, posY + height + 5)
         i = i + 1
     end
 end
