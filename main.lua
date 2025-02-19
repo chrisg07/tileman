@@ -8,6 +8,7 @@ local State = require("state")
 local Background = require("background")
 local ContextMenu = require "contextmenu"
 local World = require("world")
+local UpgradesList = require "upgradeslist"
 
 local state
 local menu
@@ -16,6 +17,7 @@ local contextMenu
 local world
 local camera
 mouseX, mouseY = love.graphics.getWidth() / 2, love.graphics.getHeight() / 2
+local upgradesList
 
 function love.load()
     background = Background:new()
@@ -27,6 +29,7 @@ function love.load()
     world = World:new(state, 1)
     menu = Menu:new(state)
     contextMenu = ContextMenu:new(state.tileSize)
+    upgradesList = UpgradesList:new(state, 600, 50, 200, 300)
 end
 
 function love.keypressed(key)
@@ -52,6 +55,7 @@ function love.update(dt)
     world:update(dt, bounceDuration, overshoot)
     menu:update(dt)
     contextMenu:update(dt, world.character, world.grid, state)
+    upgradesList:update(dt)
 
     flux.update(dt)
 
@@ -75,6 +79,7 @@ function love.draw()
     suit.draw()
     menu:draw()
 
+
     -- Draw all skill progress bars starting at (400, 50),
     -- with each bar 200px wide, 20px tall, and 20px vertical spacing.
     if state.showStats then
@@ -86,11 +91,19 @@ function love.draw()
         local skillBarPadding = 25
         state.skills:drawProgressBars(600 - skillBarPadding, skillBarPadding, 200, 20, skillBarPadding)
     end
+
+    if state.showUpgrades then
+        upgradesList:draw()
+    end
 end
 
 function love.mousepressed(x, y, button)
     contextMenu:handleMousePress(x, y, button, world.grid, world.enemies, world.character, state, camera)
     world.character:handleMousePress(x, y, button)
+end
+
+function love.wheelmoved(dx, dy)
+    upgradesList:wheelmoved(dx, dy)
 end
 
 function love.mousemoved(x, y, dx, dy)

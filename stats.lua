@@ -8,8 +8,8 @@ function Stats:new(state)
     self.stats = {
         tiles = Stat:new(state, "tiles", 1, 100),
         health = Stat:new(state, "health", 1, 100),
-        energy = Stat:new(state, "energy", 1, 100),
-        experience = Stat:new(state, "experience", 1, 100)
+        experience = Stat:new(state, "experience", 1, 100),
+        currency = Stat:new(state, "currency", 1, 100)
     }
 
     return self

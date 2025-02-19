@@ -14,7 +14,9 @@ function State:new()
         moveSpeed = 1,
         camera = Camera:new(0, 0),
         showStats = false,
-        showSkills = false
+        showSkills = false,
+        showUpgrades = false,
+        xpMultiplier = 1
     }, self)
 end
 

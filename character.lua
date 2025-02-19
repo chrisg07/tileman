@@ -172,8 +172,8 @@ function Character:handleMousePress(x, y, button)
         local screenVertices = Utils.offsetVertices(triangleVertices, self.state.camera)
 
         if Utils.pointInTriangle(x, y, screenVertices) then
-            self.state.stats:get("energy"):add(1)
-            print("Generated energy by selecting the character")
+            self.state.stats:get("experience"):add(1)
+            print("Gained experience by selecting the character")
         end
     end
 end

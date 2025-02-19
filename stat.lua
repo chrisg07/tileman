@@ -10,10 +10,12 @@ function Stat:new(state, name, amount, max)
     self.amount = amount or 1
     self.max = max or 100
     self.scale = 1 -- Normal scale
+    self.multiplier = 1
     return self
 end
 
 function Stat:add(delta)
+    delta = delta * self.multiplier
     local percentageChange = math.abs(delta) / self.max
     -- Adjust the multiplier factor to control the pulse intensity.
     local pulseMultiplier = 0.5 -- Change this to tweak the effect (0.5 means 50% additional scale at 100% gain)

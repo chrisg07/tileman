@@ -34,13 +34,20 @@ function Menu:update(dt)
         if suit.Button("Show Skills", suit.layout:col(menuButtonWidth, 25)).hit then
             self.state.showSkills = not self.state.showSkills
             self.state.showStats = false
+            self.state.showUpgrades = false
         end
 
         if suit.Button("Show Stats", suit.layout:col(menuButtonWidth, 25)).hit then
             self.state.showStats = not self.state.showStats
             self.state.showSkills = false
+            self.state.showUpgrades = false
         end
 
+        if suit.Button("Show Upgrades", suit.layout:col(menuButtonWidth, 25)).hit then
+            self.state.showUpgrades = not self.state.showUpgrades
+            self.state.showSkills = false
+            self.state.showStats = false
+        end
         
         -- suit.layout:reset(0, 25)
 
