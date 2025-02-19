@@ -8,7 +8,7 @@ State.__index = State
 function State:new()
     return setmetatable({
         mode = "menu",
-        stats = Stats:new(),
+        stats = Stats:new(self),
         skills = Skills:new(),
         tileSize = 50,
         moveSpeed = 1,

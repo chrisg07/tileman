@@ -3,8 +3,9 @@ Stat.__index = Stat
 
 local flux = require "flux.flux"
 
-function Stat:new(name, amount, max)
+function Stat:new(state, name, amount, max)
     local self = setmetatable({}, Stat)
+    self.state = state
     self.name = name or "unknown"
     self.amount = amount or 1
     self.max = max or 100
