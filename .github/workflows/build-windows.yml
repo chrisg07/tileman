@@ -9,10 +9,12 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      OUTPUT_FOLDER: ./build
     steps:
     - name: Build Windows packages
       id: build-packages
-      uses: love-action/love-actions-windows@v1
+      uses: love-action/love-actions-windows@v2
       with:
         love-package: ./game.love
         # icon-path: ./assets/windows/icon.ico
@@ -21,4 +23,19 @@ jobs:
         # app-id: ${{ secrets.APP_ID }}
         # product-website: https://www.example.com
         installer-languages: English.isl
-        output-folder: "./dist"
+        output-folder: ${{ env.OUTPUT_FOLDER }}
+    - name: Upload 32-bit artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Tileman_Windows_x86
+        path: ${{ env.OUTPUT_FOLDER }}/Tileman_x86.zip
+    - name: Upload 64-bit artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Tileman_Windows_x64
+        path: ${{ env.OUTPUT_FOLDER }}/Tileman_x64.zip
+    - name: Upload installer artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Tileman_Windows_installer
+        path: ${{ env.OUTPUT_FOLDER }}/Tileman_installer.exe
