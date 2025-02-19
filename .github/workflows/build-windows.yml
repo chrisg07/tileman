@@ -25,7 +25,7 @@ jobs:
         - name: Build core love package
           uses: love-actions/love-actions-core@v1
           with:
-            build-list: ./flux/ ./suit/ ./main.lua 
+            build-list: ./flux/ ./suit/ ./main.lua ./background.lua ./camera.lua ./character.lua ./contextmenu.lua ./enemy.lua ./grid.lua ./menu.lua ./pathfinding.lua ./skill.lua ./skills.lua ./stat.lua ./state.lua ./stats.lua ./upgrade.lua ./upgrades.lua ./upgradesList.lua ./utils.lua ./voronoi.frag ./world.lua
             package-path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
         - name: Upload core love package
           uses: actions/upload-artifact@v4
