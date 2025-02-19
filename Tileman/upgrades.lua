@@ -1,4 +1,4 @@
-local Upgrade = require("upgrade")  
+local Upgrade = require("Tileman.upgrade")  
 
 local Upgrades = {}
 

@@ -3,12 +3,12 @@ local overshoot = 1.1
 
 local suit = require "suit"
 local flux = require "flux.flux"
-local Menu = require("menu")
-local State = require("state")
-local Background = require("background")
-local ContextMenu = require "contextmenu"
-local World = require("world")
-local UpgradesList = require "upgradeslist"
+local Menu = require("Tileman.menu")
+local State = require("Tileman.state")
+local Background = require("Tileman.background")
+local ContextMenu = require "Tileman.contextmenu"
+local World = require("Tileman.world")
+local UpgradesList = require "Tileman.upgradeslist"
 
 local state
 local menu

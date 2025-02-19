@@ -1,4 +1,4 @@
-local Skill = require "skill"
+local Skill = require "Tileman.skill"
 local Skills = {}
 Skills.__index = Skills
 

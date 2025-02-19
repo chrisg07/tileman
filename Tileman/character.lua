@@ -1,5 +1,5 @@
 -- character.lua
-local Utils = require("utils")
+local Utils = require("Tileman.utils")
 local flux = require("flux.flux") -- Adjust the require path as needed
 
 local Character = {}

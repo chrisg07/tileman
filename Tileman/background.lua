@@ -6,7 +6,7 @@ function Background:new()
     local self = setmetatable({}, Background)
 
     -- Load the Voronoi shader
-    self.shader = love.graphics.newShader("voronoi.frag")
+    self.shader = love.graphics.newShader("Tileman/voronoi.frag")
 
     -- Set shader resolution
     local screenWidth, screenHeight = love.graphics.getDimensions()

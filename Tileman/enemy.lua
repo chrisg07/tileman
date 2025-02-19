@@ -2,7 +2,7 @@
 local Enemy = {}
 Enemy.__index = Enemy
 
-local Utils = require("utils") -- Require Utils for triangle vertices
+local Utils = require("Tileman.utils") -- Require Utils for triangle vertices
 
 function Enemy:new(x, y, tileSize, speed)
     return setmetatable({

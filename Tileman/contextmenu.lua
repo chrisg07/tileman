@@ -3,7 +3,7 @@ local ContextMenu = {}
 ContextMenu.__index = ContextMenu
 
 local suit = require "suit"
-local Pathfinding = require("pathfinding")
+local Pathfinding = require("Tileman.pathfinding")
 
 -- Create a new context menu.
 -- Optionally pass tileSize so the module can compute tile coordinates.

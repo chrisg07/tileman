@@ -1,7 +1,7 @@
 -- upgradeslist.lua
 local suit = require "suit"
 local flux = require "flux.flux"
-local Upgrades = require("upgrades") -- Your upgrades module containing a table 'list'
+local Upgrades = require("Tileman.upgrades") -- Your upgrades module containing a table 'list'
 local UpgradesList = {}
 UpgradesList.__index = UpgradesList
 

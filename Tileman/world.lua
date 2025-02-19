@@ -1,7 +1,7 @@
 -- world.lua
-local Grid = require("grid")
-local Character = require("character")
-local Enemy = require("enemy")
+local Grid = require("Tileman.grid")
+local Character = require("Tileman.character")
+local Enemy = require("Tileman.enemy")
 
 local World = {}
 World.__index = World

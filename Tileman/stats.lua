@@ -1,4 +1,4 @@
-local Stat = require "stat"
+local Stat = require "Tileman.stat"
 local Stats = {}
 Stats.__index = Stats
 

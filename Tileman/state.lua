@@ -1,6 +1,6 @@
-local Camera = require("camera")
-local Skills = require "skills"
-local Stats = require "stats"
+local Camera = require("Tileman.camera")
+local Skills = require "Tileman.skills"
+local Stats = require "Tileman.stats"
 
 local State = {}
 State.__index = State
