@@ -1,5 +1,12 @@
 name: Build Windows x64
 
+env:
+  BUILD_TYPE: ${{ fromJSON('["dev", "release"]')[startsWith(github.ref, 'refs/tags/v')] }}
+  CORE_LOVE_PACKAGE_PATH: ./game.love
+  CORE_LOVE_ARTIFACT_NAME: game_love_package
+  PRODUCT_NAME: tileman
+  BUNDLE_ID: com.example.tileman
+
 on:
   push:
     branches:
@@ -7,35 +14,61 @@ on:
   pull_request:
 
 jobs:
+  build-core:
+      runs-on: ubuntu-latest
+      env:
+        OUTPUT_FOLDER: ./build
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            submodules: recursive
+        - name: Build core love package
+          uses: love-actions/love-actions-core@v1
+          with:
+            build-list: ./media/ ./parts/ ./Zframework/ ./conf.lua ./main.lua ./version.lua
+            package-path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
+        - name: Upload core love package
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
+            path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
   build-windows:
     runs-on: windows-latest
     env:
       OUTPUT_FOLDER: ./build
     steps:
-    - name: Build Windows packages
-      id: build-packages
-      uses: love-action/love-actions-windows@v2
-      with:
-        love-package: ./game.love
-        # icon-path: ./assets/windows/icon.ico
-        # rc-path: ./assets/windows/template.rc
-        product-name: Tileman
-        # app-id: ${{ secrets.APP_ID }}
-        # product-website: https://www.example.com
-        installer-languages: English.isl
-        output-folder: ${{ env.OUTPUT_FOLDER }}
-    - name: Upload 32-bit artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Tileman_Windows_x86
-        path: ${{ env.OUTPUT_FOLDER }}/Tileman_x86.zip
-    - name: Upload 64-bit artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Tileman_Windows_x64
-        path: ${{ env.OUTPUT_FOLDER }}/Tileman_x64.zip
-    - name: Upload installer artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Tileman_Windows_installer
-        path: ${{ env.OUTPUT_FOLDER }}/Tileman_installer.exe
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      # Download your core love package here
+      - name: Download core love package
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
+      - name: Build Windows packages
+        id: build-packages
+        uses: love-action/love-actions-windows@v2
+        with:
+          love-package: ./game.love
+          # icon-path: ./assets/windows/icon.ico
+          # rc-path: ./assets/windows/template.rc
+          product-name: Tileman
+          # app-id: ${{ secrets.APP_ID }}
+          # product-website: https://www.example.com
+          installer-languages: English.isl
+          output-folder: ${{ env.OUTPUT_FOLDER }}
+      - name: Upload 32-bit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tileman_Windows_x86
+          path: ${{ env.OUTPUT_FOLDER }}/Tileman_x86.zip
+      - name: Upload 64-bit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tileman_Windows_x64
+          path: ${{ env.OUTPUT_FOLDER }}/Tileman_x64.zip
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tileman_Windows_installer
+          path: ${{ env.OUTPUT_FOLDER }}/Tileman_installer.exe
