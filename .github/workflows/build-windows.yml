@@ -10,31 +10,15 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Create .love file
-      run: |
-        # Exclude the .git directory and any other non-game files if needed.
-        # This will compress all files in the repository root into game.love.
-        powershell -Command "Compress-Archive -Path (Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch '\\\.git' }) -DestinationPath game.love -Force"
-
-    - name: Download LOVE2D runtime (64-bit)
-      run: |
-        # Change the URL to the desired LOVE2D version.
-        curl -L -o love.zip https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip
-
-    - name: Unzip LOVE2D runtime
-      run: |
-        Expand-Archive -Path love.zip -DestinationPath love -Force
-
-    - name: Create Windows executable
-      run: |
-        # Combine love.exe with game.love into game.exe.
-        copy /b "love\love.exe"+"game.love" "game.exe"
-
-    - name: Upload Windows build artifact
-      uses: actions/upload-artifact@v4
+    - name: Build Windows packages
+      id: build-packages
+      uses: love-action/love-actions-windows@v1
       with:
-        name: game-windows-x64
-        path: game.exe
+        love-package: ./game.love
+        # icon-path: ./assets/windows/icon.ico
+        # rc-path: ./assets/windows/template.rc
+        product-name: Tileman
+        # app-id: ${{ secrets.APP_ID }}
+        # product-website: https://www.example.com
+        installer-languages: English.isl
+        output-folder: "./dist"
