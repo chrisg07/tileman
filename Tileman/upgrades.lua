@@ -19,7 +19,14 @@ Upgrades.list = {
             state.moveSpeed = state.moveSpeed * 0.5
         end
     ),
-    -- Add additional upgrades as needed.
+    doubleExploration = Upgrade:new(
+        "Double Exploration XP Multiplier",
+        75,
+        "The grass is greener",
+        function(state)
+            state.skills:get("exploration").multiplier = state.skills:get("exploration").multiplier * 2
+        end
+    ),
 }
 
 function Upgrades:getAll()

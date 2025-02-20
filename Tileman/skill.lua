@@ -11,10 +11,12 @@ function Skill:new(name, xp, level, xpNeeded)
     self.level = level or 1
     self.xpNeeded = xpNeeded or 100
     self.scale = 1 -- Normal scale
+    self.multiploer = 1
     return self
 end
 
 function Skill:addXP(amount)
+    amount = amount * self.multiplier
     -- Calculate the percentage of the XP gain relative to the current threshold.
     local percentageGain = amount / self.xpNeeded
     -- For instance, if percentageGain is 0.5, that's a 50% gain relative to xpNeeded.
