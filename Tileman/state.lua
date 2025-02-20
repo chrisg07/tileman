@@ -15,7 +15,8 @@ function State:new()
             timer =  0,
             interval = 10,
             chance = 0.2,
-            xpGain = 2
+            minXPGain = 1,
+            maxXPGain = 3
         },
         tileSize = 50,
         moveSpeed = 1,

@@ -70,8 +70,9 @@ function love.update(dt)
     if state.meditation.active and state.meditation.timer >= state.meditation.interval then
         state.meditation.timer = state.meditation.timer - state.meditation.interval
         if math.random() < state.meditation.chance * 100 then
-            state.skills:addXP("knowledge", state.meditation.xpGain)
-            print("Meditation bonus! Awarded " .. state.meditation.xpGain .. " XP.")
+            local xp = math.random(state.meditation.minXPGain, state.meditation.maxXPGain)
+            state.skills:addXP("knowledge", xp)
+            print("Meditation bonus! Awarded " .. xp .. " XP.")
         else
             print("Meditation attempt yielded no XP this time.")
         end
