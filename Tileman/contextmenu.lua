@@ -1,4 +1,3 @@
--- contextmenu.lua
 local ContextMenu = {}
 ContextMenu.__index = ContextMenu
 
@@ -58,16 +57,6 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
         end
     end
 
-    if tileX == self.world.character.targetX and tileY == self.world.character.targetX then
-        table.insert(self.actions, {
-            label = "Meditate",
-            callback = function()
-                self.world.state.meditation.active = true
-            end
-        })
-    end
-
-    -- If an enemy is present, add an "Attack" action.
     if foundEnemy then
         table.insert(self.actions, {
             label = "Attack",
@@ -77,7 +66,6 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
         })
     end
 
-    -- Check if the tile is a tree.
     if tile and tile.type == "tree" then
         table.insert(self.actions, {
             label = "Chop Tree",
@@ -87,23 +75,41 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
         })
     end
 
-    if tile and tile.discovered then
-        table.insert(self.actions, {
-            label = "Move Here",
-            callback = function()
-                local path = Pathfinding.findPath(grid, character.targetX, character.targetY, tileX, tileY)
-
-                if path then
-                    character:setPath(path)
-                else
-                    print("No valid path found!")
+    if tileX == self.world.character.targetX and tileY == self.world.character.targetY then
+        if not self.world.state.meditation.active then
+            table.insert(self.actions, {
+                label = "Meditate",
+                callback = function()
+                    print("Meditate callback triggered")
+                    self.world.state.meditation.active = true
                 end
-            end
-        })
+            })
+        else
+            table.insert(self.actions, {
+                label = "Stop Meditating",
+                callback = function()
+                    print("Stop Meditating callback triggered; current state: " .. tostring(self.world.state.meditation.active))
+                    self.world.state.meditation.active = false
+                end
+            })
+        end
+    else
+        -- Only add the "Move Here" action if the clicked tile is not the character's tile.
+        if tile and tile.discovered then
+            table.insert(self.actions, {
+                label = "Move Here",
+                callback = function()
+                    local path = Pathfinding.findPath(grid, self.world.character.targetX, self.world.character.targetY, tileX, tileY)
+                    if path then
+                        self.world.character:setPath(path)
+                        self.world.state.meditation.active = false
+                    else
+                        print("No valid path found!")
+                    end
+                end
+            })
+        end
     end
-
-
-
 
     self.visible = true
 end
@@ -111,10 +117,15 @@ end
 -- This method can be called from love.mousepressed to let the context menu handle the right-click.
 -- Pass in all necessary dependencies.
 function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
-    if button == 2 then -- Right-click in game mode
+    if button == 2 then -- Right-click
         self:open(x, y, grid, enemies, character, state)
     elseif button == 1 then
-        self.visible = false
+        -- Check if the click is within the context menu bounds.
+        if self.visible and x >= self.x and x <= self.x + 100 and y >= self.y and y <= self.y + (#self.actions * 30) then
+            -- Do nothing so that SUIT can process the click on the button.
+        else
+            self.visible = false
+        end
     end
 end
 
