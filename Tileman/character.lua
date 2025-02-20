@@ -12,8 +12,6 @@ function Character:new(x, y, state, grid)
     return setmetatable({
         targetX = x,
         targetY = y,
-        startX = x * state.tileSize,
-        startY = y * state.tileSize,
         currentX = x * state.tileSize,
         currentY = y * state.tileSize,
         state = state,
@@ -80,8 +78,6 @@ function Character:move(dx, dy, onComplete)
 
     self.targetX = newX
     self.targetY = newY
-    self.startX = self.currentX
-    self.startY = self.currentY
 
     local targetPixelX = newX * self.state.tileSize
     local targetPixelY = newY * self.state.tileSize

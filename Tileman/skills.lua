@@ -5,9 +5,10 @@ Skills.__index = Skills
 function Skills:new()
     local self = setmetatable({}, Skills)
     self.skills = {
-        mining = Skill:new("mining", 0, 1, 100),
-        exploration = Skill:new("exploration", 0, 1, 100),
-        woodcutting = Skill:new("woodcutting", 0, 1, 100)
+        mining = Skill:new("mining", 0, 0, 100),
+        exploration = Skill:new("exploration", 0, 0, 100),
+        woodcutting = Skill:new("woodcutting", 0, 0, 100),
+        knowledge = Skill:new("knowledge", 0, 0, 100)
     }
     return self
 end

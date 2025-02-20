@@ -28,7 +28,7 @@ function love.load()
     state = State:new()
     world = World:new(state, 1)
     menu = Menu:new(state)
-    contextMenu = ContextMenu:new(state.tileSize)
+    contextMenu = ContextMenu:new(world)
     upgradesList = UpgradesList:new(state, 600, 50, 200, 300)
 end
 
@@ -65,6 +65,17 @@ function love.update(dt)
     local camX = world.character.currentX - screenWidth / 2 + state.tileSize / 2
     local camY = world.character.currentY - screenHeight / 2 + state.tileSize / 2
     state.camera:setPosition(camX, camY)
+
+    state.meditation.timer = (state.meditation.timer or 0) + dt
+    if state.meditation.active and state.meditation.timer >= state.meditation.interval then
+        state.meditation.timer = state.meditation.timer - state.meditation.interval
+        if math.random() < state.meditation.chance * 100 then
+            state.skills:addXP("knowledge", state.meditation.xpGain)
+            print("Meditation bonus! Awarded " .. state.meditation.xpGain .. " XP.")
+        else
+            print("Meditation attempt yielded no XP this time.")
+        end
+    end
 end
 
 function love.draw()

@@ -11,7 +11,7 @@ function Skill:new(name, xp, level, xpNeeded)
     self.level = level or 1
     self.xpNeeded = xpNeeded or 100
     self.scale = 1 -- Normal scale
-    self.multiploer = 1
+    self.multiplier = 1
     return self
 end
 

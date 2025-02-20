@@ -10,6 +10,13 @@ function State:new()
         mode = "menu",
         stats = Stats:new(self),
         skills = Skills:new(),
+        meditation = {
+            active = false,
+            timer =  0,
+            interval = 10,
+            chance = 0.2,
+            xpGain = 2
+        },
         tileSize = 50,
         moveSpeed = 1,
         camera = Camera:new(0, 0),

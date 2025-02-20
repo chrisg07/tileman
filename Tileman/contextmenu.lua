@@ -7,13 +7,14 @@ local Pathfinding = require("Tileman.pathfinding")
 
 -- Create a new context menu.
 -- Optionally pass tileSize so the module can compute tile coordinates.
-function ContextMenu:new(tileSize)
+function ContextMenu:new(world)
     local self = setmetatable({}, ContextMenu)
+    self.world = world
     self.visible = false
     self.x = 0
     self.y = 0
     self.actions = {} -- List of actions (each with a label and callback)
-    self.tileSize = tileSize or 50
+    self.tileSize = world.state.tileSize or 50
     return self
 end
 
@@ -55,6 +56,15 @@ function ContextMenu:open(x, y, grid, enemies, character, state)
             foundEnemy = enemy
             break
         end
+    end
+
+    if tileX == self.world.character.targetX and tileY == self.world.character.targetX then
+        table.insert(self.actions, {
+            label = "Meditate",
+            callback = function()
+                self.world.state.meditation.active = true
+            end
+        })
     end
 
     -- If an enemy is present, add an "Attack" action.
