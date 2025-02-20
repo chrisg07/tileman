@@ -24,7 +24,6 @@ function State:new()
         showStats = false,
         showSkills = false,
         showUpgrades = false,
-        xpMultiplier = 1
     }, self)
 end
 

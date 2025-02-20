@@ -113,6 +113,8 @@ end
 function ContextMenu:handleMousePress(x, y, button, grid, enemies, character, state)
     if button == 2 then -- Right-click in game mode
         self:open(x, y, grid, enemies, character, state)
+    elseif button == 1 then
+        self.visible = false
     end
 end
 
