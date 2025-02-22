@@ -31,32 +31,25 @@ function UpgradesList:update(dt)
 end
 
 function UpgradesList:draw()
-    -- Set a scissor region so that only the upgrades list region is visible.
-    love.graphics.setScissor(self.x, self.y, self.width, self.height)
-    
-    love.graphics.push()
-    -- Translate by the scroll offset.
-    love.graphics.translate(self.x, self.y - self.scroll)
-    
-    local buttonWidth, buttonHeight = self.width, 25
+    local startX, startY = self.x, self.y
+    local buttonWidth, buttonHeight = 100, 25
+    local textMargin = 10         -- margin from left for text
+    local buttonMargin = 50       -- increased margin from right edge for button
     local spacing = 5
     local yOffset = 0
 
     for key, upgrade in pairs(self.upgrades) do
-        local btn = suit.Button(upgrade.name .. " (" .. upgrade.cost .. ")", 0, yOffset, buttonWidth, buttonHeight)
+        local upgradeText = string.format("%s (%d)", upgrade.name, upgrade.cost)
+        love.graphics.print(upgradeText, startX + textMargin, startY + yOffset + (buttonHeight - love.graphics.getFont():getHeight()) / 2)
+        
+        local buttonX = startX + self.width + buttonWidth + buttonMargin
+        local btn = suit.Button("Purchase", { id = key }, buttonX, startY + yOffset, buttonWidth, buttonHeight)
         if btn.hit then
             upgrade:purchase(self.state)
-            -- if upgrade:purchase(self.state) then
-            --     flux.to(upgrade, 0.3, { scale = 1.2 })
-            --         :ease("quadout")
-            --         :oncomplete(function() flux.to(upgrade, 0.3, { scale = 1 }) end)
-            -- end
         end
+
         yOffset = yOffset + buttonHeight + spacing
     end
-
-    love.graphics.pop()
-    love.graphics.setScissor()  -- Clear the scissor region.
 end
 
 return UpgradesList

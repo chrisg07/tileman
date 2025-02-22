@@ -29,7 +29,7 @@ function love.load()
     world = World:new(state, 1)
     menu = Menu:new(state)
     contextMenu = ContextMenu:new(world)
-    upgradesList = UpgradesList:new(state, 600, 50, 200, 300)
+    upgradesList = UpgradesList:new(state, 200, 200, 200, 300)
 end
 
 function love.keypressed(key)
