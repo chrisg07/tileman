@@ -34,22 +34,34 @@ function UpgradesList:draw()
     local startX, startY = self.x, self.y
     local buttonWidth, buttonHeight = 100, 25
     local textMargin = 10         -- margin from left for text
-    local buttonMargin = 50       -- increased margin from right edge for button
+    local buttonMargin = 50       -- margin from right edge for button
     local spacing = 5
     local yOffset = 0
 
     for key, upgrade in pairs(self.upgrades) do
         local upgradeText = string.format("%s (%d)", upgrade.name, upgrade.cost)
         love.graphics.print(upgradeText, startX + textMargin, startY + yOffset + (buttonHeight - love.graphics.getFont():getHeight()) / 2)
-        
+
+        local currentCurrency = self.state.stats:get("currency").amount
+        local isDisabled = currentCurrency < upgrade.cost
         local buttonX = startX + self.width + buttonWidth + buttonMargin
-        local btn = suit.Button("Purchase", { id = key }, buttonX, startY + yOffset, buttonWidth, buttonHeight)
-        if btn.hit then
-            upgrade:purchase(self.state)
+
+        if isDisabled then
+            -- Draw a disabled button (a grey rectangle with centered text)
+            love.graphics.setColor(0.5, 0.5, 0.5, 0.7)
+            love.graphics.rectangle("fill", buttonX, startY + yOffset, buttonWidth, buttonHeight)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.printf("Purchase", buttonX, startY + yOffset + (buttonHeight - love.graphics.getFont():getHeight())/2, buttonWidth, "center")
+        else
+            local btn = suit.Button("Purchase", {id = key}, buttonX, startY + yOffset, buttonWidth, buttonHeight)
+            if btn.hit then
+                upgrade:purchase(self.state)
+            end
         end
 
         yOffset = yOffset + buttonHeight + spacing
     end
 end
+
 
 return UpgradesList

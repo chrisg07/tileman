@@ -5,14 +5,17 @@ Upgrade.__index = Upgrade
 --   name: the upgrade's name
 --   cost: the cost to purchase the upgrade
 --   description: a string describing the upgrade
---   applyFunction: a function that will be executed when the upgrade is purchased;
+--   onPurchase: a function that will be executed when the upgrade is purchased;
 --                  it can modify the game state as needed.
-function Upgrade:new(name, cost, description, applyFunction)
+--   canPurchase: a function that will be executed to determine if   the upgrade can be purchased;
+--                  it can modify the game state as needed.
+function Upgrade:new(name, cost, description, onPurchase, canPurchase)
     local self = setmetatable({}, Upgrade)
     self.name = name
     self.cost = cost
     self.description = description
-    self.apply = applyFunction or function(state) end
+    self.onPurchase = onPurchase or function(state) end
+    self.canPurchase = canPurchase or function(state) end
     self.purchased = false
     return self
 end
@@ -27,7 +30,7 @@ function Upgrade:purchase(state)
 
     if state.stats:get("currency").amount and state.stats:get("currency").amount >= self.cost then
         state.stats:get("currency").amount = state.stats:get("currency").amount - self.cost
-        self.apply(state)  -- Execute the side effects.
+        self.onPurchase(state)  -- Execute the side effects.
         self.purchased = true
         print("Purchased upgrade: " .. self.name)
         return true
