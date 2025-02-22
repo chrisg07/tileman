@@ -5,11 +5,12 @@ Stats.__index = Stats
 function Stats:new(state)
     local self = setmetatable({}, Stats)
     self.state = state
+    -- Store stats in an array-like table to maintain order
     self.stats = {
-        tiles = Stat:new(state, "tiles", 1, 100),
-        health = Stat:new(state, "health", 1, 100),
-        experience = Stat:new(state, "experience", 1, 100),
-        currency = Stat:new(state, "currency", 1, 100)
+        {name = "tiles", stat = Stat:new(state, "tiles", 1, 100)},
+        {name = "health", stat = Stat:new(state, "health", 1, 100)},
+        {name = "experience", stat = Stat:new(state, "experience", 1, 100)},
+        {name = "currency", stat = Stat:new(state, "currency", 1, 100)}
     }
 
     return self
@@ -35,14 +36,13 @@ end
 --   width, height: size of each progress bar
 --   spacing: vertical space between bars
 function Stats:drawProgressBars(x, y, width, height, spacing)
-    local i = 0
-    for name, stat in pairs(self.stats) do
+    for i, statEntry in ipairs(self.stats) do
+        local stat = statEntry.stat
         local posX = x
-        local posY = y + i * (height + spacing)
+        local posY = y + (i-1) * (height + spacing)
         -- local percent = stat:getPercent()
         -- drawProgressBar(posX, posY, width, height, percent, stat.scale)
         love.graphics.print(stat.name .. ": " .. stat.amount, posX, posY + height + 5)
-        i = i + 1
     end
 end
 
