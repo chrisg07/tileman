@@ -5,10 +5,10 @@ Skills.__index = Skills
 function Skills:new()
     local self = setmetatable({}, Skills)
     self.skills = {
-        {name = "mining", skill = Skill:new("mining", 0, 0, 100)},
+        {name = "knowledge", skill = Skill:new("knowledge", 0, 0, 10)},
         {name = "exploration", skill = Skill:new("exploration", 0, 0, 100)},
         {name = "woodcutting", skill = Skill:new("woodcutting", 0, 0, 100)},
-        {name = "knowledge", skill = Skill:new("knowledge", 0, 0, 100)}
+        {name = "mining", skill = Skill:new("mining", 0, 0, 100)},
     }
     return self
 end
@@ -64,7 +64,18 @@ function Skills:drawProgressBars(x, y, width, height, spacing)
         local posY = y + (i-1) * (height + spacing)
         local progress = skill:getProgress()
         drawProgressBar(posX, posY, width, height, progress, skill.scale)
-        love.graphics.print(skill.name .. " Lvl " .. skill.level, posX, posY + height + 5)
+        
+        -- Center the skill name and level within the progress bar
+        local skillInfo = string.format("%s Lvl %d", skill.name, skill.level)
+        local skillInfoWidth = love.graphics.getFont():getWidth(skillInfo)
+        local skillInfoX = posX + (width - skillInfoWidth) / 2
+        love.graphics.print(skillInfo, skillInfoX, posY + (height - love.graphics.getFont():getHeight()) + 35 / 2)
+        
+        -- Center the XP text within the progress bar
+        local skillXP = string.format("%d/%d", skill.xp, skill.xpNeeded)
+        local skillXPWidth = love.graphics.getFont():getWidth(skillXP)
+        local skillXPX = posX + (width - skillXPWidth) / 2
+        love.graphics.print(skillXP, skillXPX, posY + (height - love.graphics.getFont():getHeight()) / 2)
     end
 end
 

@@ -6,12 +6,11 @@ function Stats:new(state)
     local self = setmetatable({}, Stats)
     self.state = state
     self.stats = {
-        {name = "tiles", stat = Stat:new(state, "tiles", 1, 100)},
-        {name = "health", stat = Stat:new(state, "health", 1, 100)},
-        {name = "experience", stat = Stat:new(state, "experience", 1, 100)},
-        {name = "currency", stat = Stat:new(state, "currency", 1, 100)}
+        {name = "experience", stat = Stat:new(state, "experience", 0, 100)},
+        {name = "tiles", stat = Stat:new(state, "tiles", 0, 100)},
+        {name = "health", stat = Stat:new(state, "health", 0, 100)},
+        {name = "currency", stat = Stat:new(state, "currency", 0, 100)}
     }
-
     return self
 end
 

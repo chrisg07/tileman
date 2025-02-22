@@ -101,7 +101,7 @@ function love.draw()
 
     if state.showSkills then 
         local skillBarPadding = 25
-        state.skills:drawProgressBars(600 - skillBarPadding, skillBarPadding, 200, 20, skillBarPadding)
+        state.skills:drawProgressBars(700 - skillBarPadding, skillBarPadding, 100, 20, skillBarPadding)
     end
 
     if state.showUpgrades then
