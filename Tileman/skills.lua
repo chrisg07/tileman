@@ -5,10 +5,10 @@ Skills.__index = Skills
 function Skills:new()
     local self = setmetatable({}, Skills)
     self.skills = {
-        mining = Skill:new("mining", 0, 0, 100),
-        exploration = Skill:new("exploration", 0, 0, 100),
-        woodcutting = Skill:new("woodcutting", 0, 0, 100),
-        knowledge = Skill:new("knowledge", 0, 0, 100)
+        {name = "mining", skill = Skill:new("mining", 0, 0, 100)},
+        {name = "exploration", skill = Skill:new("exploration", 0, 0, 100)},
+        {name = "woodcutting", skill = Skill:new("woodcutting", 0, 0, 100)},
+        {name = "knowledge", skill = Skill:new("knowledge", 0, 0, 100)}
     }
     return self
 end
@@ -53,14 +53,13 @@ end
 --   width, height: size of each progress bar
 --   spacing: vertical space between bars
 function Skills:drawProgressBars(x, y, width, height, spacing)
-    local i = 0
-    for name, skill in pairs(self.skills) do
+    for i, skillEntry in ipairs(self.skills) do
+        local skill = skillEntry.skill
         local posX = x
-        local posY = y + i * (height + spacing)
+        local posY = y + (i-1) * (height + spacing)
         local progress = skill:getProgress()
         drawProgressBar(posX, posY, width, height, progress, skill.scale)
         love.graphics.print(skill.name .. " Lvl " .. skill.level, posX, posY + height + 5)
-        i = i + 1
     end
 end
 
