@@ -14,8 +14,8 @@ function Skills:new()
 end
 
 function Skills:addXP(skillName, amount)
-    if self.skills[skillName] then
-        self.skills[skillName]:addXP(amount)
+    if self:get(skillName) then
+        self:get(skillName):addXP(amount)
         print("Gained " .. amount .. " experience in " .. skillName)
     else
         print("Skill '" .. skillName .. "' does not exist!")
@@ -23,7 +23,12 @@ function Skills:addXP(skillName, amount)
 end
 
 function Skills:get(skillName)
-    return self.skills[skillName]
+    for _, skillEntry in ipairs(self.skills) do
+        if skillEntry.name == skillName then
+            return skillEntry.skill
+        end
+    end
+    return nil -- Return nil if the skill is not found
 end
 
 local function drawProgressBar(x, y, width, height, progress, scale)

@@ -5,7 +5,6 @@ Stats.__index = Stats
 function Stats:new(state)
     local self = setmetatable({}, Stats)
     self.state = state
-    -- Store stats in an array-like table to maintain order
     self.stats = {
         {name = "tiles", stat = Stat:new(state, "tiles", 1, 100)},
         {name = "health", stat = Stat:new(state, "health", 1, 100)},
@@ -16,10 +15,9 @@ function Stats:new(state)
     return self
 end
 
--- Add XP to a given stat.
 function Stats:add(statName, amount)
-    if self.stats[statName] then
-        self.stats[statName]:add(amount)
+    if self:get(statName) then
+        self:get(statName):add(amount)
         print("Gained " .. amount .. " in " .. statName)
     else
         print("Stat '" .. statName .. "' does not exist!")
@@ -27,7 +25,12 @@ function Stats:add(statName, amount)
 end
 
 function Stats:get(statName)
-    return self.stats[statName]
+    for _, statEntry in ipairs(self.stats) do
+        if statEntry.name == statName then
+            return statEntry.stat
+        end
+    end
+    return nil -- Return nil if the stat is not found
 end
 
 -- Draw all the progress bars for the stats.
