@@ -24,6 +24,7 @@ Genre: Incremental, Idle
 
 ## Design Principles
 ### Document your key design philosophies (like your "juicy" gameplay goal)
+- [Juicy](https://www.youtube.com/watch?v=Fy0aCDmgnxg)
 ### List non-negotiable requirements
 ### Define your design constraints
 
@@ -33,8 +34,8 @@ Genre: Incremental, Idle
 ### Performance targets
 ### Platform-specific considerations
 ### Third-party dependencies 
-- SUIT
-- flux
+- [SUIT](https://github.com/vrld/suit) - Menus, buttons
+- [flux](https://github.com/rxi/flux) - Tweening values for animations
 
 ## Feature Specifications
 ### Break down each major system with:
@@ -43,7 +44,17 @@ Genre: Incremental, Idle
 #### Tile types
 - Types: Grass, Water, Tree, Stone
 #### Skills
-- Melee, Ranged, Magic, Mining, Smelting, Agriculture, Woodcutting, Barter, Knowledge
+- Melee: Gained when damaging an enemy when using a melee weapon. Increases to this skill increase the characters ability to deal damage with melee weapons.
+- Ranged: Gained when damaging an enemy when using a ranged weapon. Increases to this skill increase the characters ability to d eal damage with ranged weapons.
+- Defense: Gained when being damaged by enemies. Increases to this skill reduce the damage a character takes when being damaged. 
+- Magic: Gained when casting spells. Increases to this skill unlocks new spells.
+- Mining: Gained when mining resources. Increases to this skill 
+- Smelting
+- Agriculture
+- Woodcutting
+- Barter
+- Knowledge
+- Hunting
 #### Upgrades
 - For each skill: reduce tick rate for gaining experience, increase amount of experience gained, reduce scaling factor of experience required for increasing skill level
 #### Tasks
@@ -66,16 +77,24 @@ Genre: Incremental, Idle
 ### Combat system (if any)
 
 ## Visual and UI Style Guide
+- Pixel art simple polygons
 ### Art direction
 ### UI/UX principles
+- Menus should be presented in a similar manner across the application. 
+- When possible the same sizing and layouts should be used whenever lists of information or upgrades are displayed.
+- If an action or upgrade require a certain criteria to be met and that criteria is not currently met then that action or upgrade be disabled an visually appear as disabled.
 ### Animation guidelines
+- Actions taken by the player should result in visual feedback. Visual feedback will scale based on how effective of an action was. The effectiveness of an action will be determined by the impact the generated experience had in progressing the characters skills. 
 ### Color palette
 ### Typography choices
 
 ## Data Structures and Systems
 ### Document how you want core systems structured:
 ### Save/load system requirements
+- Things that should be saved: core game state (skills, experience, upgrades, resources), generated world, position of entities
 ### Player data structure
+- Skills
+- Gathered resources
 ### World generation parameters
 - To start the only tile type that will be able to be generated or discovered is `Grass`.
 - As additional tile types are unlocked the character will be able to discover previously unseen tiles to have a chance of generating the new or improved tile type.
